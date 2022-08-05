@@ -1,0 +1,6 @@
+lightest blue: #B4C0D9
+light blue #5872A6
+Blue: #313E59
+Dark Blue: #151B26
+Black #0D0D0D
+

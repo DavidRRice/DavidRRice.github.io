@@ -1,0 +1,575 @@
+<!DOCTYPE HTML>
+<!--
+	David R. Rice, astronomer
+	Created using Hyperspace by HTML5 UP
+	html5up.net | by @ajlkn
+	Templates free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+	Please do not copy my, David R. Rice's, exact design
+-->
+<html>
+	<head>
+		<title>David R. Rice</title>
+		<meta name="author" content="David R. Rice" />
+		<meta name="description" content="University of Nevada, Las Vegas graduate student participating in astrophysics and astronomy research with primary interest in exoplanets, planet interiors, and planetary dynamics" />
+		<meta name="keywords" content="David Rice, David R. Rice, astronomy, astrophysics, Las Vegas, research, graduate, PhD, student, researcher, science, Northwestern, CIERA, exoplanets, exoplanet, interior, dynamics, UNLV, interiors, planets, planetary, tutor" />
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+	</head>
+	<body class="is-preload">
+
+		<!-- Sidebar -->
+			<section id="sidebar">
+				<div class="inner">
+					<nav>
+						<ul>
+							<li><a href="#intro">Home</a></li>
+							<li><a href="#one">Research Projects</a></li>
+							<li><a href="#two">About Me &#38; CV</a></li>
+							<li><a href="#three">Contact</a></li>
+						</ul>
+					</nav>
+				</div>
+			</section>
+
+		<!-- Wrapper -->
+			<div id="wrapper">
+
+				<!-- Intro -->
+					<section id="intro" class="wrapper style1 fullscreen fade-up">
+						<div class="inner">
+							<a class="image1"><img src="images/david-rice.jpg" alt="Headshot of David Rice" /></a>
+							<h1>David R. Rice</h1>
+							<p>Ph.D. Candidate in Astronomy at <a href="http://www.physics.unlv.edu//" target="_blank">University of Nevada, Las Vegas</a>
+								<br>Research on Planet Interiors and Dynamics
+							</p>	
+							<ul class="icons">
+									<li><a href="https://orcid.org/0000-0001-6009-8685" target="_blank"  class="icon brands fa-orcid"><span class="label">OrcID</span></a></li>
+									<li><a href="https://twitter.com/Magrathea_staff" target="_blank" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li>
+									<li><a href="https://www.linkedin.com/in/david-r-rice/" target="_blank" class="icon brands fa-linkedin-in"><span class="label">LinkedIn</span></a></li>
+									<li><a class="icon solid fa-envelope"><span> &#8211;David.Rice [&alpha;t] unlv [dot] edu&#8211;</span></a></li>
+							</ul>	
+							<p><br></p>
+							<ul class="actions">
+								<a href="#one" class="button icon solid solo fa-arrow-down scrolly"></a>
+							</ul>
+						</div>
+					</section>
+					<section id="one" class="wrapper style1 fade-up">
+						<div class="inner">
+							<div class="content">
+								<div class="inner">
+									<h4>I research the formation and evolution of planets from their interiors to their dynamics through computational techniques. My goal as a researcher is to investigate planets through a lens which integrates astrophysics and geoscience.
+									<br>Read more about my projects below.</h4>
+								</div>
+							</div>
+						</div>
+					</section>
+				<!-- One -->
+					<section id="oneandhalf" class="wrapper style2 spotlights" >
+						<section>
+							<div class="content">
+								<div class="inner">
+									<h2>Characterizing Planet Interiors</h2>
+									<p>The densities of observed terrestrial planets allow for a range of interior compositions from Mercury-like to volatile-rich.
+										For my dissertation, I test model parameters and quantify systematic uncertainties in inferences of the composition of the Trappist-1 planets.
+										I presented my initial findings at the <a href="https://ui.adsabs.harvard.edu/abs/2022BAAS...54e2202R/abstract" target="_blank">Exoplanets IV</a> and <a href="https://www.rockyworlds.org/previous/rocky-worlds-ii/posters" target="_blank">Rocky Worlds II</a> conferences and a paper is planned for Fall 2022.
+										In addition, I collaborate with high-pressure physicists to test new measurements of planet-building materials: <a href="https://ui.adsabs.harvard.edu/abs/2021MNRAS.503.2825H/abstract" target="_blank">ADS</a>. I'm also open for collaboration with observational groups to characterize their planets.
+										I characterize K2-138's planets in the work below.
+									</p>
+									<ul class="actions">
+										<li><a href="https://ui.adsabs.harvard.edu/abs/2022AJ....163..162M/abstract" target="_blank" class="button">Characterization of K2-138</a></li>
+									</ul>
+								</div>
+							</div>
+							<a class="image"><img src="images/T1finterior.png" alt="Core-Mantle-Water Ternary Diagram showing possible interiors of a planet" data-position="25% 25%" /></a>
+						</section>
+						<section>
+							<div class="content">
+								<div class="inner">
+									<h2>MAGRATHEA: Interior Structure Solver</h2>
+									<p>The community uses a variety of models to characterize the interior structure of small planets. <a href="https://www.lpl.arizona.edu/~huangcl/" target="_blank">Chenliang Huang</a>, Jason Steffen, and I developed MAGRATHEA to be a community standard 1D planet structure code.
+										<a href="https://github.com/Huang-CL/Magrathea" target="_blank">MAGRATHEA</a> is open-source and can be customized to user-defined planet models. Our code features adaptable phase diagrams for the core, mantle, hydrosphere, and atmosphere and transparent formatting for equations of state.
+										MAGRATHEA's utility is detailed in our publication (<a href="https://ui.adsabs.harvard.edu/abs/2022MNRAS.513.5256H/abstract" target="_blank">ADS</a>) and is archived on <a href="https://emac.gsfc.nasa.gov/" target="_blank">NASA's Exoplanet Modeling and Analysis Center</a>.</p>
+									<ul class="actions">
+										<li><a href="https://github.com/Huang-CL/Magrathea" class="button" target="_blank">GitHub</a></li>
+									</ul>
+									<p2>Use these drop-downs to show a corresponding ternary pre-calculated with MAGRATHEA:</p2>
+										 <table>
+											 <tr>
+												 <td>
+										<p2> Mass
+										<select id="mass" class="myselect">
+											<option value="1">1</option>
+											<option value="3">3</option>
+											<option value="5">5</option>
+										</select>
+										M_Earth</p2>
+										</td>
+											 <td>
+										<p2> Surface Temp.
+										<select id="temp" class="myselect">
+											<option value="300">300</option>
+											<option value="1000">1000</option>
+										</select>
+										K</p2>
+											 </td>
+											 <td>
+										<p2> Atm. Mass
+										<select id="atm" class="myselect">
+											<option value="0">0</option>
+											<option value="1">0.01</option>
+											<option value="2">0.1</option>
+										</select>
+										%</p2>
+											 </td>
+										 </tr>
+										</table>
+										<img class="image2" id="currentImage" src="images/ternary/ternary1-300-0.svg" alt="Core-Mantle-Water Ternary Diagram showing radii of given mass planet">
+
+								</div>
+							</div>
+						</section>
+						<section>
+							<div class="content">
+								<div class="inner">
+									<h2>Stable Lifetimes of Planetary Systems</h2>
+									<p>Closely packed planetary systems will experience orbital crossings at a time related to the orbital separations of the planets. After a crossing, the system enters a period of chaotic evolution ending in planetary collisions or ejections.
+										These collisions are essential to the formation of stable systems. I study stability timescales through n-body simulations on <a href="https://www.nscee.edu/cherry-creek-resources.html" target="_blank">Cherry-Creek</a>, UNLV's supercomputer cluster.
+										My first published work, <a href="https://ui.adsabs.harvard.edu/abs/2018MNRAS.481.2205R/abstract" target="_blank">ADS</a>, finds that inclined systems may avoid a planet collision for long periods of time. My second work, <a href="https://ui.adsabs.harvard.edu/abs/2022arXiv220611374R/abstract" target="_blank">ADS</a>, explores the heteroscedasticity of stability time in non-equal mass systems.</p>
+									<ul class="actions">
+										<li><a href="https://ui.adsabs.harvard.edu/search/q=docs(91734c3e7f19ac309acfe421cf9a6c33)&sort=date%20desc%2C%20bibcode%20desc&p_=0" target="_blank" class="button">Publications</a></li>
+									</ul>
+								</div>
+							</div>
+							<a class="image"><img src="images/researthdark.png" alt="Stability time with spacing of systems with different mass planets" data-position="25% 25%" /></a>
+						</section>
+						<section>
+							<div class="content">
+								<div class="inner">
+									<h2>Research Group</h2>
+									<p>I research with <a href="https://www.jasonhsteffen.com" target="_blank">Prof. Jason H. Steffen</a>.
+										Among other projects, one goal of our group is to track chemical composition of planets from condensation in the protoplanetary disk to engulfment by a white dwarf.
+										We are a part of the <a href="https://unlv-spfg.github.io/" target="_blank">Star & Planet Formation group</a> and the <a href="https://www.physics.unlv.edu/research_astro.html" target="_blank">Nevada Center for Astrophysics</a>.
+									</p>
+									<ul class="actions">
+										<li><a href="https://www.jasonhsteffen.com/people" target="_blank" class="button">Steffen Research Group</a></li>
+									</ul>
+								</div>
+							</div>
+							<a class="image"><img src="images/black_square.png" alt="Disk Logo" data-position="25% 25%" /></a>
+						</section>
+					</section>
+
+				<!-- Two -->
+					<section id="two" class="wrapper style3 fade-up">
+						<div class="inner">
+							<h2>About Me</h2>
+							<div class="features">
+								<section>
+									<span class="icon solid major fa-file-pdf"></span>
+									<h3>CV</h3>
+									<p><a href="images/David_Rice_CV_web.pdf" target="_blank"><b>PDF Link</b></a> Last updated: 5th Aug. 2022</p>
+								</section>
+								<section>
+									<span class="icon solid major fa-bullhorn"></span>
+									<h3>I'm on the job market Fall 2022!</h3>
+									<p>Applying for postdoctoral positions and fellowships</p>
+								</section>
+								<section>
+									<span class="icon solid major fa-university"></span>
+									<h3>University of Nevada, Las Vegas</h3>
+									<p>Masters in Astronomy.<br>PhD expected June 2023</p>
+								</section>
+								<section>
+									<span class="icon solid major fa-graduation-cap"></span>
+									<h3>Northwestern University</h3>
+									<p>B.A. in <a href="https://isp.northwestern.edu/" target="_blank">Integrated Science</a>, Physics and Astronomy, and Earth and Planetary Science</p>
+								</section>
+								<section>
+									<span class="icon solid major fa-award"></span>
+									<h3>Presidents Graduate Research Fellow</h3>
+									<p>UNLV Fellowship for '22-23 academic year</p>
+								</section>
+								<section>
+									<span class="icon solid major fa-hands-helping"></span>
+									<h3>Mentor</h3>
+									<p>I mentor two undergraduates, Tristan Benally and Rosalie Chaleunsouk, in research and received a Mentorship Certificate.</p>
+								</section>
+								<section>
+									<span class="icon solid major fa-rocket"></span>
+									<h3>Astronomy on Tap</h3>
+									<p>I am the founder and current emcee of <a href="https://astronomyontap.org/locations/las-vegas-nevada/" target="_blank">AoT, LV</a>. We present astronomy to our Las Vegas community through engaging and accessible events.
+										We hold 3-4 events a year at <a href="http://astronomyaleworks.com/" target="_blank">Astronomy Aleworks</a>. I maintain an active community on our <a href="https://www.facebook.com/aotvegas/" target="_blank">Facebook</a>.</p>
+								</section>
+								<section>
+									<span class="icon solid major fa-comments"></span>
+									<h3>Public Talks</h3>
+									<p>I love sharing science with others and have given talks through <a href="https://www.skypeascientist.com/" target="_blank">Skype a Scientist</a> and the Las Vegas Astronomical
+										Society. You can watch me discuss Pluto with the CSN Planetarium <a href="https://youtu.be/EnzSoXZJtIs" target="_blank">here</a>.</p>
+								</section>
+								<section>
+									<span class="icon solid major fa-chalkboard-teacher"></span>
+									<h3>Teaching</h3>
+									<p>At UNLV, I taught mechanics, E&#38;M, and modern physics undergraduate labs.
+										In Chicago, I spent a year with <a href="https://www.sagaeducation.org/" target="_blank">SAGA Education</a> providing high-dosage math tutoring to at-risk high school students.
+										Read about the success of the program <a href="https://www.povertyactionlab.org/case-study/individualized-tutoring-improve-learning?utm_campaign=may20&utm_medium=email&utm_source=newsletter" target="_blank">here</a>.</p>
+								</section>
+								<section>
+									<span class="icon solid major fa-pencil-alt"></span>
+									<h3>Tutoring</h3>
+									<p>I tutor all-ages in physics, math, and astronomy. You can hire me for tutoring on <a href="https://www.wyzant.com/Tutors/NV/Las_Vegas/9433968" target="_blank">Wyzant</a>.</p>
+								</section>
+								<section>
+									<span class="icon solid major fa-home"></span>
+									<h3>Small Town</h3>
+									<p>Although I love Chicago, Evanston, and Las Vegas, home still means Iowa for me. I grew up in a small suburb of the suburbs of Des Moines.</p>
+								</section>
+								<section>
+									<span class="icon solid major fa-hiking"></span>
+									<h3>Hobbies</h3>
+									<p>I enjoy getting out of the city with my wife to explore the outdoors through camping, hiking, and–of course–stargazing.</p>
+								</section>
+							</div>
+							<div class="responsive">
+						  <div class="gallery">
+							  <img src="images/aot.jpg" alt="Astronomy on Tap" width="600" height="400">
+							<div class="desc">Kicking off our 5th Astronomy on Tap, Las Vegas.</div>
+						  </div>
+						</div>
+
+
+						<div class="responsive">
+						  <div class="gallery">
+							  <img src="images/posterpres.jpg" alt="Poster Presentation" width="600" height="400">
+							<div class="desc">Rosalie presenting about MAGRATHEA at ExoIV.</div>
+						  </div>
+						</div>
+
+						<div class="responsive">
+						  <div class="gallery">
+							  <img src="images/lowell.jpg" alt="Lowell Observatory" width="600" height="400">
+							<div class="desc">Lowell Observatory in Flagstaff with Nicole Rice.<br></div>
+						  </div>
+						</div>
+
+						<div class="responsive">
+						  <div class="gallery">
+							  <img src="images/trechime.jpg" alt="Tre Cime Mountains" width="600" height="400">
+							<div class="desc">Hiking Tre Cime di Lavaredo in the Italian Dolomites.</div>
+						  </div>
+						</div>
+
+						<div class="clearfix"></div>
+						</div>
+					</section>
+
+				<!-- Three -->
+					<section id="three" class="wrapper style1 fade-up">
+						<div class="inner">
+							<h2>Get in touch</h2>
+							<p></p>
+							<div>
+								<section>
+									<ul class="contact">
+										<li>
+											<h3>Email</h3>
+											<p>
+											&#8211;david.rice [&alpha;t] unlv [dot] edu&#8211;<br>
+											&#8211;drice986 [&alpha;t] gmail [dot] com&#8211;
+											</p>
+										</li>
+										<li>
+											<h3>Social</h3>
+											<ul class="icons">
+												<li><a href="https://orcid.org/0000-0001-6009-8685" target="_blank" class="icon brands fa-orcid"><span class="label">OrcID</span></a></li>
+												<li><a href="https://twitter.com/Magrathea_staff" target="_blank" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li>
+												<li><a href="https://www.researchgate.net/profile/David-Rice-4" target="_blank" class="icon brands fa-researchgate"><span class="label">Research Gate</span></a></li>
+												<li><a href="https://www.linkedin.com/in/david-r-rice/" target="_blank" class="icon brands fa-linkedin-in"><span class="label">LinkedIn</span></a></li>
+												<li><a href="https://github.com/DavidRRice" target="_blank" class="icon brands fa-github"><span class="label">GitHub</span></a></li>
+											</ul>
+										</li>
+									</ul>
+								</section>
+							</div>
+						</div>
+					</section>
+
+			</div>
+
+		<!-- Footer -->
+			<footer id="footer" class="wrapper style1-alt">
+				<div class="inner">
+					<ul class="menu">
+						<li>David R. Rice 2022</li><li>Design: <a href="http://html5up.net" target="_blank">HTML5 UP</a></li>
+					</ul>
+				</div>
+			</footer>
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/jquery.scrollex.min.js"></script>
+			<script src="assets/js/jquery.scrolly.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+
+
+
+
+<script>
+$(document).ready(function(){
+  $('.dropdown').on('show.bs.dropdown', function(){
+    alert('The dropdown is about to be shown.');
+  });
+});
+</script>
+
+
+<script>
+        $("#mass").on('change', function() {
+            var mass = $( "#mass").val();
+            var temp = $( "#temp").val();
+            var atmo = $( "#atm").val();
+
+            if (mass== '1'  && temp == '300' && atmo== '0'){
+                console.log('all first values - 3rd drop');
+                show_image('./images/ternary/ternary1-300-0.svg')
+            }
+            if (mass== '1'  && temp == '300' && atmo== '1'){
+                console.log('all first values - 3rd drop');
+                show_image('./images/ternary/ternary1-300-1.svg')
+            }
+            if (mass== '1'  && temp == '300' && atmo== '2'){
+                console.log('all first values - 3rd drop');
+                show_image('./images/ternary/ternary1-300-2.svg')
+            }
+            if (mass== '1'  && temp == '1000' && atmo== '0'){
+                console.log('all first values - 3rd drop');
+                show_image('./images/ternary/ternary1-1000-0.svg')
+            }
+            if (mass== '1'  && temp == '1000' && atmo== '1'){
+                console.log('all first values - 3rd drop');
+                show_image('./images/ternary/ternary1-1000-1.svg')
+            }
+            if (mass== '1'  && temp == '1000' && atmo== '2'){
+                console.log('all first values - 3rd drop');
+                show_image('./images/ternary/ternary1-1000-2.svg')
+            }
+            if (mass== '3'  && temp == '300' && atmo== '0'){
+                console.log('all first values - 3rd drop');
+                show_image('./images/ternary/ternary3-300-0.svg')
+            }
+            if (mass== '3'  && temp == '300' && atmo== '1'){
+                console.log('all first values - 3rd drop');
+                show_image('./images/ternary/ternary3-300-1.svg')
+            }
+            if (mass== '3'  && temp == '300' && atmo== '2'){
+                console.log('all first values - 3rd drop');
+                show_image('./images/ternary/ternary3-300-2.svg')
+            }
+            if (mass== '3'  && temp == '1000' && atmo== '0'){
+                console.log('all first values - 3rd drop');
+                show_image('./images/ternary/ternary3-1000-0.svg')
+            }
+            if (mass== '3'  && temp == '1000' && atmo== '1'){
+                console.log('all first values - 3rd drop');
+                show_image('./images/ternary/ternary3-1000-1.svg')
+            }
+            if (mass== '3'  && temp == '1000' && atmo== '2'){
+                console.log('all first values - 3rd drop');
+                show_image('./images/ternary/ternary3-1000-2.svg')
+            }
+            if (mass== '5'  && temp == '300' && atmo== '0'){
+                console.log('all first values - 3rd drop');
+                show_image('./images/ternary/ternary5-300-0.svg')
+            }
+            if (mass== '5'  && temp == '300' && atmo== '1'){
+                console.log('all first values - 3rd drop');
+                show_image('./images/ternary/ternary5-300-1.svg')
+            }
+            if (mass== '5'  && temp == '300' && atmo== '2'){
+                console.log('all first values - 3rd drop');
+                show_image('./images/ternary/ternary5-300-2.svg')
+            }
+            if (mass== '5'  && temp == '1000' && atmo== '0'){
+                console.log('all first values - 3rd drop');
+                show_image('./images/ternary/ternary5-1000-0.svg')
+            }
+            if (mass== '5'  && temp == '1000' && atmo== '1'){
+                console.log('all first values - 3rd drop');
+                show_image('./images/ternary/ternary5-1000-1.svg')
+            }
+            if (mass== '5'  && temp == '1000' && atmo== '2'){
+                console.log('all first values - 3rd drop');
+                show_image('./images/ternary/ternary5-1000-2.svg')
+            }
+    });
+        $("#temp").on('change', function() {
+            var mass = $( "#mass option:selected" ).text();
+            var temp = $( "#temp option:selected" ).text();
+            var atmo = $( "#atm").val();
+
+            if (mass== '1'  && temp == '300' && atmo== '0'){
+                console.log('all first values - 3rd drop');
+                show_image('./images/ternary/ternary1-300-0.svg')
+            }
+            if (mass== '1'  && temp == '300' && atmo== '1'){
+                console.log('all first values - 3rd drop');
+                show_image('./images/ternary/ternary1-300-1.svg')
+            }
+            if (mass== '1'  && temp == '300' && atmo== '2'){
+                console.log('all first values - 3rd drop');
+                show_image('./images/ternary/ternary1-300-2.svg')
+            }
+            if (mass== '1'  && temp == '1000' && atmo== '0'){
+                console.log('all first values - 3rd drop');
+                show_image('./images/ternary/ternary1-1000-0.svg')
+            }
+            if (mass== '1'  && temp == '1000' && atmo== '1'){
+                console.log('all first values - 3rd drop');
+                show_image('./images/ternary/ternary1-1000-1.svg')
+            }
+            if (mass== '1'  && temp == '1000' && atmo== '2'){
+                console.log('all first values - 3rd drop');
+                show_image('./images/ternary/ternary1-1000-2.svg')
+            }
+            if (mass== '3'  && temp == '300' && atmo== '0'){
+                console.log('all first values - 3rd drop');
+                show_image('./images/ternary/ternary3-300-0.svg')
+            }
+            if (mass== '3'  && temp == '300' && atmo== '1'){
+                console.log('all first values - 3rd drop');
+                show_image('./images/ternary/ternary3-300-1.svg')
+            }
+            if (mass== '3'  && temp == '300' && atmo== '2'){
+                console.log('all first values - 3rd drop');
+                show_image('./images/ternary/ternary3-300-2.svg')
+            }
+            if (mass== '3'  && temp == '1000' && atmo== '0'){
+                console.log('all first values - 3rd drop');
+                show_image('./images/ternary/ternary3-1000-0.svg')
+            }
+            if (mass== '3'  && temp == '1000' && atmo== '1'){
+                console.log('all first values - 3rd drop');
+                show_image('./images/ternary/ternary3-1000-1.svg')
+            }
+            if (mass== '3'  && temp == '1000' && atmo== '2'){
+                console.log('all first values - 3rd drop');
+                show_image('./images/ternary/ternary3-1000-2.svg')
+            }
+            if (mass== '5'  && temp == '300' && atmo== '0'){
+                console.log('all first values - 3rd drop');
+                show_image('./images/ternary/ternary5-300-0.svg')
+            }
+            if (mass== '5'  && temp == '300' && atmo== '1'){
+                console.log('all first values - 3rd drop');
+                show_image('./images/ternary/ternary5-300-1.svg')
+            }
+            if (mass== '5'  && temp == '300' && atmo== '2'){
+                console.log('all first values - 3rd drop');
+                show_image('./images/ternary/ternary5-300-2.svg')
+            }
+            if (mass== '5'  && temp == '1000' && atmo== '0'){
+                console.log('all first values - 3rd drop');
+                show_image('./images/ternary/ternary5-1000-0.svg')
+            }
+            if (mass== '5'  && temp == '1000' && atmo== '1'){
+                console.log('all first values - 3rd drop');
+                show_image('./images/ternary/ternary5-1000-1.svg')
+            }
+            if (mass== '5'  && temp == '1000' && atmo== '2'){
+                console.log('all first values - 3rd drop');
+                show_image('./images/ternary/ternary5-1000-2.svg')
+            }
+    });
+
+    $("#atm").on('change', function() {
+            var mass = $( "#mass option:selected" ).text();
+            var temp = $( "#temp option:selected" ).text();
+            var atmo = $( "#atm").val();
+
+            if (mass== '1'  && temp == '300' && atmo== '0'){
+                console.log('all first values - 3rd drop');
+                show_image('./images/ternary/ternary1-300-0.svg')
+            }
+            if (mass== '1'  && temp == '300' && atmo== '1'){
+                console.log('all first values - 3rd drop');
+                show_image('./images/ternary/ternary1-300-1.svg')
+            }
+            if (mass== '1'  && temp == '300' && atmo== '2'){
+                console.log('all first values - 3rd drop');
+                show_image('./images/ternary/ternary1-300-2.svg')
+            }
+            if (mass== '1'  && temp == '1000' && atmo== '0'){
+                console.log('all first values - 3rd drop');
+                show_image('./images/ternary/ternary1-1000-0.svg')
+            }
+            if (mass== '1'  && temp == '1000' && atmo== '1'){
+                console.log('all first values - 3rd drop');
+                show_image('./images/ternary/ternary1-1000-1.svg')
+            }
+            if (mass== '1'  && temp == '1000' && atmo== '2'){
+                console.log('all first values - 3rd drop');
+                show_image('./images/ternary/ternary1-1000-2.svg')
+            }
+            if (mass== '3'  && temp == '300' && atmo== '0'){
+                console.log('all first values - 3rd drop');
+                show_image('./images/ternary/ternary3-300-0.svg')
+            }
+            if (mass== '3'  && temp == '300' && atmo== '1'){
+                console.log('all first values - 3rd drop');
+                show_image('./images/ternary/ternary3-300-1.svg')
+            }
+            if (mass== '3'  && temp == '300' && atmo== '2'){
+                console.log('all first values - 3rd drop');
+                show_image('./images/ternary/ternary3-300-2.svg')
+            }
+            if (mass== '3'  && temp == '1000' && atmo== '0'){
+                console.log('all first values - 3rd drop');
+                show_image('./images/ternary/ternary3-1000-0.svg')
+            }
+            if (mass== '3'  && temp == '1000' && atmo== '1'){
+                console.log('all first values - 3rd drop');
+                show_image('./images/ternary/ternary3-1000-1.svg')
+            }
+            if (mass== '3'  && temp == '1000' && atmo== '2'){
+                console.log('all first values - 3rd drop');
+                show_image('./images/ternary/ternary3-1000-2.svg')
+            }
+            if (mass== '5'  && temp == '300' && atmo== '0'){
+                console.log('all first values - 3rd drop');
+                show_image('./images/ternary/ternary5-300-0.svg')
+            }
+            if (mass== '5'  && temp == '300' && atmo== '1'){
+                console.log('all first values - 3rd drop');
+                show_image('./images/ternary/ternary5-300-1.svg')
+            }
+            if (mass== '5'  && temp == '300' && atmo== '2'){
+                console.log('all first values - 3rd drop');
+                show_image('./images/ternary/ternary5-300-2.svg')
+            }
+            if (mass== '5'  && temp == '1000' && atmo== '0'){
+                console.log('all first values - 3rd drop');
+                show_image('./images/ternary/ternary5-1000-0.svg')
+            }
+            if (mass== '5'  && temp == '1000' && atmo== '1'){
+                console.log('all first values - 3rd drop');
+                show_image('./images/ternary/ternary5-1000-1.svg')
+            }
+            if (mass== '5'  && temp == '1000' && atmo== '2'){
+                console.log('all first values - 3rd drop');
+                show_image('./images/ternary/ternary5-1000-2.svg')
+            }
+    });
+
+    function show_image(source) {
+        document.getElementById("currentImage").src = source;
+    }
+
+</script>
+
+	</body>
+</html>
