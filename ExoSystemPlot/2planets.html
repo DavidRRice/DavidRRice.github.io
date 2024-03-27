@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2+ planets</title>
+    <style>
+        .container {
+            display: flex; /* Use flexbox for layout */
+        }
+
+        .plot-container {
+   	    position: absolute; /* Position the left container */
+            left: 0; /* Align the left edge of the container to the left */
+            width: 150px; /* Adjust the width as needed */ 
+	    z-index: 2;
+        }
+
+        .plot-container1 {
+   	    position: absolute; /* Position the left container */
+            left: 100px; /* Align the left edge of the container to the left */
+            width: 1000px; /* Adjust the width as needed */
+	    z-index: 1;
+        }
+
+        .plot-container iframe {
+            width: 150px; /* Make plots fill the container width */
+            border: none; /* Remove border around iframes */
+            height: 17800px; /* Ensure iframes take up full height of container */
+        }
+
+        .plot-container1 iframe {
+            width: 1500px; /* Make plots fill the container width */
+            border: none; /* Remove border around iframes */
+            height: 17800px; /* Ensure iframes take up full height of container */
+        }
+    </style>
+</head>
+<body>
+Created by <a href="https://davidrrice.github.io/" target="_blank">David R. Rice</a>.<br> Data from <a href="https://exoplanetarchive.ipac.caltech.edu/index.html" target="_blank">NASA Exoplanet Archive</a>'s Planetary Systems Composite Parameter Table (DOI 10.26133/NEA13). Accessed 26 March 2024.<br>Using Plotly and Astroquery Python packages.<br>
+<br><b><big>Confirmed planets discovered by transit in systems with 2 or more planets</big></b>
+<br><small>where="discoverymethod='Transit' and sy_pnum>1"
+<br>A planet will not be shown if missing parameters, some planets in systems may not be transiting and will not have radius measurments to be shown</small>
+<br><br><span style="display: inline-block; width: 21ch;">&#9;</span><b>Select an x-axis</b>:
+    <div class="container">
+        <div class="plot-container">
+            <iframe src="hoststar_2planets.html" frameborder="0"></iframe>
+        </div>
+        <div class="plot-container1">
+            <iframe src="planets_2planets.html" frameborder="0"></iframe>
+        </div>
+    </div>
+
+</body>
+</html>
