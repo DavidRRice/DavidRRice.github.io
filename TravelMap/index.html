@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Web interface for creating travel maps, coloring in countries/states based on user provided text lists" />
+  <meta name="keywords" content="David Rice, David R. Rice, astronomy, maps, countries, states, travel, graphing, html, continent, Natural Earth, Earth, world, globe, projection, mercator" />
+  <title>Travel Map — David R. Rice</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://unpkg.com/d3@7"></script>
+  <script src="https://unpkg.com/topojson-client@3"></script>
+  <script src="https://unpkg.com/d3-geo-projection@4"></script>
+  <script src="https://unpkg.com/save-svg-as-png@1.4.17/lib/saveSvgAsPng.js"></script>
+</head>
+<body>
+  <header>
+    <h1>Oh, the Places You'll Go!</h1>
+    <p class="sub">Color the map based on where you've been or plan to go! Upload lists of countries and U.S. states (instructions below).</p>
+  </header>
+
+  <section class="controls">
+    <div class="row">
+      <label>Projection
+        <select id="proj">
+          <option value="mercator" selected>Web Mercator</option>
+          <option value="robinson">Robinson</option>
+        </select>
+      </label>
+      <label>Zoom to selected
+        <input type="checkbox" id="zoom" checked>
+      </label>
+      <label>Include outlying territories
+        <input type="checkbox" id="outliers" checked>
+      </label>
+    </div>
+    <div class="row">
+      <label>Country list(s)
+        <input id="files" type="file" multiple accept=".txt">
+      </label>
+      <label>U.S. states list (optional)
+        <input id="statesFile" type="file" accept=".txt">
+      </label>
+      </div>
+      <div class="row">
+      <button id="render">Render!</button>
+      <button id="downloadSVG">Download SVG</button>
+      <button id="downloadPNG">Download PNG</button>
+      <button id="downloadJPG">Download JPG</button>
+    </div>
+  </section>
+  
+  <section class="lists-config">
+  <h2>List order & colors</h2>
+  <p class="hint">Drag-like with the arrow buttons to reorder; adjust colors if you like.</p>
+  <div id="listsPanel" class="lists-panel"></div>
+</section>
+
+  <main>
+    <svg id="map" width="1280" height="740" role="img" aria-label="Travel Map"></svg>
+    <div id="legend"></div>
+    <pre id="log"></pre>
+  </main>
+
+    <section class="help">
+  <h2>How to prepare your text files</h2>
+  <ul>
+    <li>Create a simple <code>.txt</code> file with one country per line.</li>
+    <li>You can use either the <strong>ISO-3 code</strong> (e.g. <code>USA</code>, <code>FRA</code>, <code>JPN</code>)
+        or the <strong>country name</strong> (e.g. <code>United States of America</code>, <code>France</code>, <code>Japan</code>).</li>
+    <li>Don’t mix commas or extra formatting — just one entry per line.</li>
+    <li>Example:
+      <pre>
+USA
+CAN
+MEX
+BRA
+      </pre>
+    </li>
+    <li>You can upload multiple files (e.g. “Visited.txt”, “Planned.txt”). Each file will get its own color in the map and the name of the file will be used in the legend.</li>
+    <li>For U.S. states: make a separate <code>.txt</code> file with either full names (<code>California</code>, <code>New York</code>)
+        or USPS codes (<code>CA</code>, <code>NY</code>, <code>WI</code>).</li>
+  </ul>
+    <div class="examples">
+    <strong>Download examples:</strong>
+    <a href="Visited.txt" target="_blank" download>Visited.txt</a>
+    <a href="Planned.txt" target="_blank" download>Planned.txt</a>
+    <a href="States.txt" target="_blank" download>States.txt</a>
+  </div>
+</section>
+
+<section class="inspiration">
+  <blockquote class="seuss">
+    “You’re off to Great Places! Today is your day!  
+    Your mountain is waiting, so… get on your way!”
+    <br>
+    <span>— Dr. Seuss, <em>Oh, the Places You’ll Go!</em></span>
+  </blockquote>
+</section>
+
+  <footer>
+    <p>Built by David R. Rice: <a href="https://davidrrice.github.io/" target="_blank" rel="noopener">davidrrice.github.io</a>. This static page runs entirely in your browser.</p>
+     <p class="credits">
+    Map data <a href="https://www.naturalearthdata.com/" target="_blank" rel="noopener">Natural Earth</a> 
+    and <a href="https://github.com/topojson/us-atlas" target="_blank" rel="noopener">U.S. Census Bureau (via us-atlas)</a>.
+  </p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,119 @@
+:root {
+  --bg: #0b0c10;
+  --panel: #121419;
+  --text: #e8eaf0;
+  --muted: #b9bdc8;
+  --accent: #5872A6;
+  --accent-2: #8ecae6;
+  --border: #22242a;
+  --map-bg: #0f1116;
+  --stroke: #2b2f38;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: #151B26; color: var(--text); font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; }
+a { color: var(--accent-2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+header, .controls, footer { padding: 1rem clamp(1rem, 3vw, 2rem); }
+header h1 { margin: 0 0 .25rem; font-weight: 800; letter-spacing: .3px; }
+header .sub { margin: .2rem 0 0; color: var(--text); font-size: 1.1rem; }
+.controls { background: var(--panel); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+.controls .row { display: flex; flex-wrap: wrap; gap: .8rem 1.2rem; align-items: center; margin: .4rem 0; }
+label { display:inline-flex; gap:.5rem; align-items:center; color: var(--text); }
+select, input[type="file"] { background: #0d0f14; color: var(--text); border: 1px solid var(--border); padding: .35rem .5rem; border-radius: 8px; }
+input[type="file"] { color: var(--muted); }
+button { background: var(--accent); color: white; border: none; padding: .55rem .9rem; border-radius: 9px; font-weight: 700; cursor: pointer; }
+button:hover { filter: brightness(1.07); }
+button:active { transform: translateY(1px); }
+main { padding: 1rem clamp(1rem, 3vw, 2rem); }
+#map { width: min(96vw, 1280px); height: auto; border: 1px solid var(--border); background: var(--map-bg); border-radius: 12px; display:block; margin-bottom: .8rem; }
+#legend { display:flex; flex-wrap:wrap; gap:.5rem 1rem; align-items:center; }
+.legend-item { display:flex; align-items:center; gap:.5rem; color: var(--muted); padding:.2rem .35rem; border:1px solid var(--border); border-radius: 7px; background:#0e1117; }
+.legend-swatch { width: 14px; height: 14px; border-radius: 3px; outline: 1px solid #111; }
+#log { margin-top: .6rem; color: var(--muted); font-size: .9rem; white-space: pre-wrap; }
+footer { color: var(--muted); border-top: 1px solid var(--border); }
+
+.help {
+  padding: 1rem clamp(1rem, 3vw, 2rem);
+  color: var(--text);
+}
+.help h2 {
+  font-size: 1.1rem;
+  margin-bottom: 0.4rem;
+  color: var(--text);
+}
+.help pre {
+  background: #111319;
+  padding: 0.5rem 0.8rem;
+  border-radius: 6px;
+  color: var(--accent-2);
+}
+.help .examples {
+  margin-top: .5rem;
+  display: flex; gap: .6rem; flex-wrap: wrap;
+}
+.help .examples a {
+  padding: .3rem .55rem; border: 1px solid var(--border);
+  border-radius: 6px; color: var(--accent-2); text-decoration: none;
+  background: #0e1117;
+}
+.help .examples a:hover { filter: brightness(1.08); }
+/* List order & colors panel */
+.lists-config { padding: 0.5rem clamp(1rem, 3vw, 2rem); border-bottom: 1px solid var(--border); background: var(--panel); }
+.lists-config h2 { margin: 0 0 .4rem; font-size: 1rem; color: var(--text); }
+.lists-config .hint { margin: 0 0 .6rem; color: var(--muted); font-size: .9rem; }
+.lists-panel {
+  display: grid;
+  grid-template-columns: auto auto auto 1fr; /* name, color, arrows, index */
+  gap: 0.4rem;
+  align-items: center;
+}
+.list-name {
+  white-space: nowrap;
+}
+.list-color input[type="color"] {
+  margin-left: 0.3rem;
+}
+.list-item { display: contents; }
+.list-color input[type="color"] { width: 36px; height: 28px; background: transparent; border: 1px solid var(--border); border-radius: 6px; padding: 0; }
+.list-controls { display: inline-flex; gap: .3rem; align-items: center; }
+.list-controls button { padding: .35rem .55rem; border-radius: 6px; }
+.list-index { align-self: center; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+/* Highlight helpers (for legend hover) */
+.geo { transition: opacity .15s ease; }
+.dim { opacity: .25; }
+
+.inspiration {
+  margin: 2rem auto;
+  max-width: 800px;
+  text-align: center;
+}
+
+.inspiration blockquote.seuss {
+  font-style: italic;
+  font-size: 1.1rem;
+  color: var(--text);
+  border-left: 4px solid var(--accent, #4e79a7);
+  padding-left: 0.8rem;
+  display: inline-block;
+  text-align: left;
+}
+
+.inspiration blockquote.seuss span {
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+li pre {
+  background: var(--panel);
+  padding: 0.5rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  max-width: 300px;   /* keeps it narrow */
+  margin: 0.4rem 0;
+  overflow-x: auto;   /* in case of long lines */
+  font-family: monospace;
+  font-size: 0.9rem;
+}
