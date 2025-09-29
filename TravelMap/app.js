@@ -82,6 +82,13 @@ let nameIndex;
 let listConfig = [];         // [{ file, label }], user-controlled order
 let colorSlots = [];         // colors by position; reordering swaps which file gets which color
 
+// Get chosen DPI, convert to scale relative to 96dpi
+function getDpiScale() {
+  const sel = document.getElementById('dpi');
+  const dpi = sel ? parseFloat(sel.value) || 300 : 300;
+  return Math.max(1, dpi / 96);
+}
+
 // Build the List order & colors UI dynamically so no HTML edit is needed
 (function setupConfigurator(){
   if (document.getElementById('listsPanel')) return; // already present
@@ -454,28 +461,45 @@ document.getElementById('downloadSVG').onclick = () => {
   const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "travel_map.svg"; a.click();
 };
 document.getElementById('downloadPNG').onclick = () => {
-  saveSvgAsPng(document.getElementById('map'), 'travel_map.png', { scale: 2 });
+  const scale = getDpiScale();
+  saveSvgAsPng(document.getElementById('map'), 'travel_map.png', { scale });
 };
 document.getElementById('downloadJPG').onclick = () => {
   const svgNode = document.getElementById('map');
   const serializer = new XMLSerializer();
   let source = serializer.serializeToString(svgNode);
+
   if (!source.match(/^<svg[^>]+xmlns=/)) {
     source = source.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
   }
-  const svgBlob = new Blob([source], {type: 'image/svg+xml;charset=utf-8'});
+
+  const svgBlob = new Blob([source], { type: 'image/svg+xml;charset=utf-8' });
   const url = URL.createObjectURL(svgBlob);
+
   const img = new Image();
   img.onload = () => {
-    const width = parseInt(svgNode.getAttribute('width')) || svgNode.clientWidth || 1280;
+    const width  = parseInt(svgNode.getAttribute('width'))  || svgNode.clientWidth  || 1280;
     const height = parseInt(svgNode.getAttribute('height')) || svgNode.clientHeight || 720;
+
+    const scale = getDpiScale();          // 96 -> 1, 300 -> ~3.125, etc.
+    const outW  = Math.round(width * scale);
+    const outH  = Math.round(height * scale);
+
     const canvas = document.createElement('canvas');
-    canvas.width = width;
-    canvas.height = height;
-    const ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#ffffff'; // change to your --bg if you want dark JPG background
-    ctx.fillRect(0, 0, width, height);
-    ctx.drawImage(img, 0, 0, width, height);
+    canvas.width  = outW;
+    canvas.height = outH;
+
+    const ctx = canvas.getContext('2d');  // <-- you were missing this line
+    ctx.imageSmoothingEnabled  = true;
+    ctx.imageSmoothingQuality  = 'high';
+
+    // white background for JPG
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, outW, outH);
+
+    // draw the SVG image scaled to the output size
+    ctx.drawImage(img, 0, 0, outW, outH);
+
     canvas.toBlob((blob) => {
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
@@ -484,5 +508,11 @@ document.getElementById('downloadJPG').onclick = () => {
       URL.revokeObjectURL(url);
     }, 'image/jpeg', 0.95);
   };
-  img.src = url;
+
+  img.onerror = () => {
+    console.error('Failed to load SVG as image for JPG export.');
+    URL.revokeObjectURL(url);
+  };
+
+  img.src = url;  // <-- you were missing this line
 };

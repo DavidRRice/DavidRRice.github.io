@@ -85,27 +85,46 @@ footer { color: var(--muted); border-top: 1px solid var(--border); }
 
 .inspiration {
   margin: 2rem auto;
-  max-width: 800px;
-  text-align: center;
+  max-width: 900px;
+  padding: 0 clamp(1rem, 3vw, 2rem);
 }
 
-.inspiration blockquote.seuss {
+.insp-wrap {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.insp-thumb {
+  flex: 0 0 auto;
+  max-width: 240px;          /* cap size on wide screens */
+  height: auto;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+}
+
+.seuss {
   font-style: italic;
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   color: var(--text);
   border-left: 4px solid var(--accent, #4e79a7);
   padding-left: 0.8rem;
-  display: inline-block;
-  text-align: left;
+  line-height: 1.5;
+  margin: 0;                 /* tighten with the image */
 }
-
-.inspiration blockquote.seuss span {
+.seuss span {
   display: block;
   margin-top: 0.5rem;
   font-size: 0.9rem;
   color: var(--muted);
 }
 
+/* Stack on small screens */
+@media (max-width: 600px) {
+  .insp-wrap { flex-direction: column; align-items: flex-start; }
+  .insp-thumb { max-width: 100%; }
+}
 li pre {
   background: var(--panel);
   padding: 0.5rem 0.8rem;
@@ -116,4 +135,8 @@ li pre {
   overflow-x: auto;   /* in case of long lines */
   font-family: monospace;
   font-size: 0.9rem;
+}
+
+[id] {
+  scroll-margin-top: 40px; /* adjust if you have a fixed header */
 }

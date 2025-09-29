@@ -6,13 +6,20 @@
   <meta name="description" content="Web interface for creating travel maps, coloring in countries/states based on user provided text lists" />
   <meta name="keywords" content="David Rice, David R. Rice, astronomy, maps, countries, states, travel, graphing, html, continent, Natural Earth, Earth, world, globe, projection, mercator" />
   <meta property="og:type" content="website" />
-	<meta property="og:url" content="https://DavidRRice.github.io/TravelMap/" />
+  <meta property="og:title" content="Travel Map Web" />
+  <meta property="og:description" content="Upload your country and state lists to generate your own travel map." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://davidrrice.github.io/TravelMap/" />
+  <meta property="og:image" content="https://davidrrice.github.io/TravelMap/example_map_small.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="fb:app_id" content="0" />
 
 	<!-- Twitter Card -->
 	<meta name="twitter:card" content="summary_large_image" />
 	<meta name="twitter:title" content="Travel Map Web" />
 	<meta name="twitter:description" content="Upload your country/state lists and generate your own travel map." />
-	<meta name="twitter:image" content="https://DavidRRice.github.io/TravelMap/example_map.png" />
+	<meta name="twitter:image" content="https://DavidRRice.github.io/TravelMap//example_map_small.png" />
   <title>Travel Map — David R. Rice</title>
   <link rel="stylesheet" href="styles.css">
   <script src="https://unpkg.com/d3@7"></script>
@@ -23,7 +30,8 @@
 <body>
   <header>
     <h1>Oh, the Places You'll Go!</h1>
-    <p class="sub">Color the map based on where you've been or plan to go! Upload lists of countries and U.S. states (instructions below).</p>
+    <p class="sub">Color the map based on where you've been or plan to go!</p>
+    <p class="sub">Upload your lists to create a travel map (<a href="#instructions">instructions below</a>) — everything runs locally in your browser, and nothing is saved or shared.</p>
   </header>
 
   <section class="controls">
@@ -54,6 +62,13 @@
       <button id="downloadSVG">Download SVG</button>
       <button id="downloadPNG">Download PNG</button>
       <button id="downloadJPG">Download JPG</button>
+      <label for="dpi">Output DPI</label>
+      <select id="dpi">
+      <option value="96">96 (screen)</option>
+      <option value="150">150</option>
+       <option value="300" selected>300 (print)</option>
+      <option value="450">450</option>
+    </select>
     </div>
   </section>
   
@@ -70,7 +85,7 @@
   </main>
 
     <section class="help">
-  <h2>How to prepare your text files</h2>
+  <h2 id="instructions">How to prepare your text files</h2>
   <ul>
     <li>Create a simple <code>.txt</code> file with one country per line.</li>
     <li>You can use either the <strong>ISO-3 code</strong> (e.g. <code>USA</code>, <code>FRA</code>, <code>JPN</code>)
@@ -97,19 +112,33 @@ BRA
 </section>
 
 <section class="inspiration">
+<div class="insp-wrap">
+    <img
+      src="example_map.png" 
+      alt="Sample travel map preview"
+      class="insp-thumb"
+      loading="lazy"
+      width="300" height="180"
+    />
   <blockquote class="seuss">
     “You’re off to Great Places! Today is your day!  
     Your mountain is waiting, so… get on your way!”
     <br>
     <span>— Dr. Seuss, <em>Oh, the Places You’ll Go!</em></span>
   </blockquote>
+  </div>
 </section>
 
   <footer>
+    <p>
+    <a href="https://github.com/DavidRRice/DavidRRice.github.io/tree/main/TravelMap" target="_blank" rel="noopener">
+      View source on GitHub
+    </a>
+  </p>
     <p>Built by David R. Rice: <a href="https://davidrrice.github.io/" target="_blank" rel="noopener">davidrrice.github.io</a>. This static page runs entirely in your browser.</p>
      <p class="credits">
     Map data <a href="https://www.naturalearthdata.com/" target="_blank" rel="noopener">Natural Earth</a> 
-    and <a href="https://github.com/topojson/us-atlas" target="_blank" rel="noopener">U.S. Census Bureau (via us-atlas)</a>.
+    and <a href="https://github.com/topojson/us-atlas" target="_blank" rel="noopener">U.S. Census Bureau (via us-atlas)</a>. Last Updated: September 2025.
   </p>
   </footer>
 
