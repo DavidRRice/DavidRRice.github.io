@@ -150,6 +150,52 @@ function rebuildListsPanel() {
   });
 }
 
+function cloneForExport(svgNode, { bg = '#eef3f8', scale = 1 } = {}) {
+  const svg = svgNode.cloneNode(true);
+  const width  = parseInt(svgNode.getAttribute('width'))  || svgNode.clientWidth  || 1280;
+  const height = parseInt(svgNode.getAttribute('height')) || svgNode.clientHeight || 720;
+
+  // 1) Add a background "ocean" fill just for export (set bg = 'transparent' if you want none)
+  if (bg && bg !== 'transparent') {
+    const NS = 'http://www.w3.org/2000/svg';
+    const rect = document.createElementNS(NS, 'rect');
+    rect.setAttribute('x', 0);
+    rect.setAttribute('y', 0);
+    rect.setAttribute('width', width);
+    rect.setAttribute('height', height);
+    rect.setAttribute('fill', bg);
+    svg.insertBefore(rect, svg.firstChild);
+  }
+
+  // 2) Make outlines crisper for export only
+  const bump = Math.max(1, scale * 0.9); // scale-aware bump
+  svg.querySelectorAll('.country').forEach(p => {
+    const w = parseFloat(p.getAttribute('stroke-width') || '0.6');
+    p.setAttribute('stroke', '#000');           // stronger
+    p.setAttribute('stroke-opacity', '1');
+    p.setAttribute('stroke-width', (w * bump).toFixed(2));
+  });
+  // Optional: tweak state boundaries too
+  svg.querySelectorAll('.state').forEach(p => {
+    const w = parseFloat(p.getAttribute('stroke-width') || '0.7');
+    p.setAttribute('stroke', '#000');
+    p.setAttribute('stroke-opacity', '1');
+    p.setAttribute('stroke-width', (w * bump).toFixed(2));
+  });
+
+  return { svg, width, height };
+}
+
+function svgToImageURL(svgEl) {
+  const serializer = new XMLSerializer();
+  let source = serializer.serializeToString(svgEl);
+  if (!source.match(/^<svg[^>]+xmlns=/)) {
+    source = source.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
+  }
+  const blob = new Blob([source], { type: 'image/svg+xml;charset=utf-8' });
+  return URL.createObjectURL(blob);
+}
+
 // Seed listConfig/colors when files are selected
 document.getElementById('files')?.addEventListener('change', (e) => {
   const files = Array.from(e.target.files || []);
@@ -461,43 +507,58 @@ document.getElementById('downloadSVG').onclick = () => {
   const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "travel_map.svg"; a.click();
 };
 document.getElementById('downloadPNG').onclick = () => {
-  const scale = getDpiScale();
-  saveSvgAsPng(document.getElementById('map'), 'travel_map.png', { scale });
-};
-document.getElementById('downloadJPG').onclick = () => {
   const svgNode = document.getElementById('map');
-  const serializer = new XMLSerializer();
-  let source = serializer.serializeToString(svgNode);
+  const scale = getDpiScale(); // 96->1, 300->~3.125, etc.
 
-  if (!source.match(/^<svg[^>]+xmlns=/)) {
-    source = source.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
-  }
-
-  const svgBlob = new Blob([source], { type: 'image/svg+xml;charset=utf-8' });
-  const url = URL.createObjectURL(svgBlob);
+  const { svg, width, height } = cloneForExport(svgNode, { bg: '#eef3f8', scale });
+  const url = svgToImageURL(svg);
 
   const img = new Image();
   img.onload = () => {
-    const width  = parseInt(svgNode.getAttribute('width'))  || svgNode.clientWidth  || 1280;
-    const height = parseInt(svgNode.getAttribute('height')) || svgNode.clientHeight || 720;
-
-    const scale = getDpiScale();          // 96 -> 1, 300 -> ~3.125, etc.
-    const outW  = Math.round(width * scale);
-    const outH  = Math.round(height * scale);
-
+    const outW = Math.round(width * scale);
+    const outH = Math.round(height * scale);
     const canvas = document.createElement('canvas');
-    canvas.width  = outW;
+    canvas.width = outW;
     canvas.height = outH;
+    const ctx = canvas.getContext('2d');
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(img, 0, 0, outW, outH);
 
-    const ctx = canvas.getContext('2d');  // <-- you were missing this line
-    ctx.imageSmoothingEnabled  = true;
-    ctx.imageSmoothingQuality  = 'high';
+    canvas.toBlob((blob) => {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'travel_map.png';
+      a.click();
+      URL.revokeObjectURL(a.href);
+      URL.revokeObjectURL(url);
+    }, 'image/png');
+  };
+  img.onerror = () => URL.revokeObjectURL(url);
+  img.src = url;
+};
+document.getElementById('downloadJPG').onclick = () => {
+  const svgNode = document.getElementById('map');
+  const scale = getDpiScale();
 
-    // white background for JPG
+  const { svg, width, height } = cloneForExport(svgNode, { bg: '#ffffff', scale });
+  const url = svgToImageURL(svg);
+
+  const img = new Image();
+  img.onload = () => {
+    const outW = Math.round(width * scale);
+    const outH = Math.round(height * scale);
+    const canvas = document.createElement('canvas');
+    canvas.width = outW;
+    canvas.height = outH;
+    const ctx = canvas.getContext('2d');
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+
+    // White background for JPG
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, outW, outH);
 
-    // draw the SVG image scaled to the output size
     ctx.drawImage(img, 0, 0, outW, outH);
 
     canvas.toBlob((blob) => {
@@ -505,14 +566,10 @@ document.getElementById('downloadJPG').onclick = () => {
       a.href = URL.createObjectURL(blob);
       a.download = 'travel_map.jpg';
       a.click();
+      URL.revokeObjectURL(a.href);
       URL.revokeObjectURL(url);
     }, 'image/jpeg', 0.95);
   };
-
-  img.onerror = () => {
-    console.error('Failed to load SVG as image for JPG export.');
-    URL.revokeObjectURL(url);
-  };
-
-  img.src = url;  // <-- you were missing this line
+  img.onerror = () => URL.revokeObjectURL(url);
+  img.src = url;
 };
