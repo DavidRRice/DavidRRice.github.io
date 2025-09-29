@@ -325,8 +325,8 @@ document.getElementById('render').onclick = async () => {
         .attr('data-groups','')
         .attr('d', path(f))
         .attr('fill', '#0f1116')
-        .attr('stroke', '#2b2f38')
-        .attr('stroke-width', 0.4);
+        .attr('stroke', '#333')
+        .attr('stroke-width', 0.7)
     } else {
       const arr = membership.get(key) || [];
       g.append('path')
@@ -334,8 +334,8 @@ document.getElementById('render').onclick = async () => {
         .attr('data-groups', arr.join(','))
         .attr('d', path({type:"Feature", geometry: geom}))
         .attr('fill', fill)
-        .attr('stroke', '#2b2f38')
-        .attr('stroke-width', 0.4);
+        .attr('stroke', '#333')
+        .attr('stroke-width', 0.7)
     }
   });
 
