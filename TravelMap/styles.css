@@ -140,3 +140,9 @@ li pre {
 [id] {
   scroll-margin-top: 40px; /* adjust if you have a fixed header */
 }
+
+.country {
+  stroke: #333;          /* darker outline */
+  stroke-width: 0.8px;   /* a little thicker */
+  stroke-opacity: 0.9;   /* nearly solid */
+}
