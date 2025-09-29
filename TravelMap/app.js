@@ -150,12 +150,12 @@ function rebuildListsPanel() {
   });
 }
 
-function cloneForExport(svgNode, { bg = '#eef3f8', scale = 1 } = {}) {
+function cloneForExport(svgNode, { bg = 'transparent', scale = 1, strokeColor = '#e9eef5' } = {}) {
   const svg = svgNode.cloneNode(true);
   const width  = parseInt(svgNode.getAttribute('width'))  || svgNode.clientWidth  || 1280;
   const height = parseInt(svgNode.getAttribute('height')) || svgNode.clientHeight || 720;
 
-  // 1) Add a background "ocean" fill just for export (set bg = 'transparent' if you want none)
+  // Background (only for the exported copy)
   if (bg && bg !== 'transparent') {
     const NS = 'http://www.w3.org/2000/svg';
     const rect = document.createElementNS(NS, 'rect');
@@ -167,20 +167,23 @@ function cloneForExport(svgNode, { bg = '#eef3f8', scale = 1 } = {}) {
     svg.insertBefore(rect, svg.firstChild);
   }
 
-  // 2) Make outlines crisper for export only
-  const bump = Math.max(1, scale * 0.9); // scale-aware bump
+  // Stronger, light outlines for export only
+  const bump = Math.max(1, scale * 0.9);
   svg.querySelectorAll('.country').forEach(p => {
     const w = parseFloat(p.getAttribute('stroke-width') || '0.6');
-    p.setAttribute('stroke', '#000');           // stronger
+    p.setAttribute('stroke', strokeColor);
     p.setAttribute('stroke-opacity', '1');
     p.setAttribute('stroke-width', (w * bump).toFixed(2));
+    p.setAttribute('stroke-linejoin', 'round');
+    p.setAttribute('stroke-linecap', 'round');
   });
-  // Optional: tweak state boundaries too
   svg.querySelectorAll('.state').forEach(p => {
     const w = parseFloat(p.getAttribute('stroke-width') || '0.7');
-    p.setAttribute('stroke', '#000');
+    p.setAttribute('stroke', strokeColor);
     p.setAttribute('stroke-opacity', '1');
     p.setAttribute('stroke-width', (w * bump).toFixed(2));
+    p.setAttribute('stroke-linejoin', 'round');
+    p.setAttribute('stroke-linecap', 'round');
   });
 
   return { svg, width, height };
@@ -508,23 +511,26 @@ document.getElementById('downloadSVG').onclick = () => {
 };
 document.getElementById('downloadPNG').onclick = () => {
   const svgNode = document.getElementById('map');
-  const scale = getDpiScale(); // 96->1, 300->~3.125, etc.
+  const scale = getDpiScale();
 
-  const { svg, width, height } = cloneForExport(svgNode, { bg: '#eef3f8', scale });
+  // keep ocean/background as you like; outlines now light
+  const { svg, width, height } = cloneForExport(svgNode, {
+    bg: '#eef3f8',          // or 'transparent'
+    scale,
+    strokeColor: '#ffffff'  // light outlines
+  });
+
   const url = svgToImageURL(svg);
-
   const img = new Image();
   img.onload = () => {
     const outW = Math.round(width * scale);
     const outH = Math.round(height * scale);
     const canvas = document.createElement('canvas');
-    canvas.width = outW;
-    canvas.height = outH;
+    canvas.width = outW; canvas.height = outH;
     const ctx = canvas.getContext('2d');
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
     ctx.drawImage(img, 0, 0, outW, outH);
-
     canvas.toBlob((blob) => {
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
@@ -541,26 +547,28 @@ document.getElementById('downloadJPG').onclick = () => {
   const svgNode = document.getElementById('map');
   const scale = getDpiScale();
 
-  const { svg, width, height } = cloneForExport(svgNode, { bg: '#ffffff', scale });
-  const url = svgToImageURL(svg);
+  const { svg, width, height } = cloneForExport(svgNode, {
+    bg: '#000000',          // dark background looks great with light outlines; or '#ffffff'
+    scale,
+    strokeColor: '#ffffff'  // light outlines
+  });
 
+  const url = svgToImageURL(svg);
   const img = new Image();
   img.onload = () => {
     const outW = Math.round(width * scale);
     const outH = Math.round(height * scale);
     const canvas = document.createElement('canvas');
-    canvas.width = outW;
-    canvas.height = outH;
+    canvas.width = outW; canvas.height = outH;
     const ctx = canvas.getContext('2d');
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
 
-    // White background for JPG
-    ctx.fillStyle = '#ffffff';
+    // JPG needs a background; match the bg you passed to cloneForExport
+    ctx.fillStyle = '#000000'; // or '#ffffff' if you used white
     ctx.fillRect(0, 0, outW, outH);
 
     ctx.drawImage(img, 0, 0, outW, outH);
-
     canvas.toBlob((blob) => {
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
