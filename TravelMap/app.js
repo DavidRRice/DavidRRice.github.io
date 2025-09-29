@@ -150,7 +150,7 @@ function rebuildListsPanel() {
   });
 }
 
-function cloneForExport(svgNode, { bg = 'transparent', scale = 1, strokeColor = '#e9eef5' } = {}) {
+function cloneForExport(svgNode, { bg = 'transparent', scale = 1, strokeColor = '#aaa' } = {}) {
   const svg = svgNode.cloneNode(true);
   const width  = parseInt(svgNode.getAttribute('width'))  || svgNode.clientWidth  || 1280;
   const height = parseInt(svgNode.getAttribute('height')) || svgNode.clientHeight || 720;
@@ -168,7 +168,7 @@ function cloneForExport(svgNode, { bg = 'transparent', scale = 1, strokeColor = 
   }
 
   // Stronger, light outlines for export only
-  const bump = Math.max(1, scale * 0.9);
+  const bump = Math.max(1, scale * 0.5);
   svg.querySelectorAll('.country').forEach(p => {
     const w = parseFloat(p.getAttribute('stroke-width') || '0.6');
     p.setAttribute('stroke', strokeColor);
