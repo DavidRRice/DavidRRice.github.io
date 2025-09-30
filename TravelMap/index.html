@@ -57,6 +57,22 @@
         <input id="statesFile" type="file" accept=".txt">
       </label>
       </div>
+	    <div class="view-switch">
+  <label>View</label>
+  <select id="viewMode" aria-label="Switch map view">
+    <option value="map">Flat map</option>
+    <option value="globe">Globe (orthographic)</option>
+  </select>
+
+  <label class="hemis">Hemisphere</label>
+  <button id="hemi-americas" aria-label="Americas">Americas</button>
+  <button id="hemi-euraf" aria-label="Europe and Africa">Europe–Africa</button>
+  <button id="hemi-asia" aria-label="Asia and Oceania">Asia–Oceania</button>
+  <button id="hemi-n" aria-label="North Pole">N</button>
+  <button id="hemi-s" aria-label="South Pole">S</button>
+
+  <label><input type="checkbox" id="spin" /> Auto-spin</label>
+</div>
       <div class="row">
       <button id="render">Render!</button>
       <button id="downloadSVG">Download SVG</button>
