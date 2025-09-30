@@ -142,7 +142,7 @@ li pre {
 }
 
 .country {
-  stroke: #333;          /* darker outline */
+  stroke: #aaa;          /* darker outline */
   stroke-width: 0.8px;   /* a little thicker */
   stroke-opacity: 0.9;   /* nearly solid */
 }
