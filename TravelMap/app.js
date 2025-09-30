@@ -78,6 +78,62 @@ const legend = d3.select('#legend');
 const logEl = d3.select('#log');
 
 let worldTopo, worldFC, usTopo, usFC;
+// === Globe / View mode additions ===
+let viewMode = 'map';           // 'map' | 'globe'
+let projection;                 // active d3 projection
+let spinRAF = null;
+let autoSpin = false;
+
+// Inject a small View switcher UI (no HTML edits required)
+(function setupViewSwitcher(){
+  if (document.getElementById('viewMode')) return;
+  const controls = document.querySelector('.controls');
+  if (!controls) return;
+  const wrap = document.createElement('div');
+  wrap.className = 'view-switch';
+  wrap.innerHTML = `
+    <label>View</label>
+    <select id="viewMode" aria-label="Switch map view">
+      <option value="map">Flat map</option>
+      <option value="globe">Globe (orthographic)</option>
+    </select>
+    <span class="hemi-set" style="margin-left:.5rem">
+      <label>Hemisphere</label>
+      <button id="hemi-americas" aria-label="Americas">Americas</button>
+      <button id="hemi-euraf" aria-label="Europe–Africa">Eur–Afr</button>
+      <button id="hemi-asia" aria-label="Asia–Oceania">Asia–Oc</button>
+      <button id="hemi-n" aria-label="North Pole">N</button>
+      <button id="hemi-s" aria-label="South Pole">S</button>
+    </span>
+    <label style="margin-left:.5rem"><input type="checkbox" id="spin"> Auto‑spin</label>
+  `;
+  controls.appendChild(wrap);
+
+  // minimal CSS
+  if (!document.getElementById('globe-css')) {
+    const css = document.createElement('style');
+    css.id = 'globe-css';
+    css.textContent = `
+      .view-switch { display:flex; align-items:center; gap:.4rem; flex-wrap:wrap; margin-top:.5rem; }
+      .sphere-layer .sphere { fill: var(--panel); stroke:#888; stroke-width:.6; }
+      .sphere-layer .graticule { fill:none; stroke:#777; stroke-opacity:.35; stroke-width:.5; }
+      .hemi-set button { padding:.25rem .4rem; border-radius:6px; }
+      /* Default hide hemisphere & spin until globe is chosen */
+      .hemi-set, #spin { display: none; }
+      body.globe-mode .hemi-set, body.globe-mode #spin { display: inline-block; }
+    `;
+    document.head.appendChild(css);
+  }
+})();
+
+// Toggle body class based on view selection
+document.addEventListener('change', (ev) => {
+  if (ev.target?.id === 'viewMode') {
+    if (ev.target.value === 'globe') document.body.classList.add('globe-mode');
+    else document.body.classList.remove('globe-mode');
+  }
+});
+
 let nameIndex;
 let listConfig = [];         // [{ file, label }], user-controlled order
 let colorSlots = [];         // colors by position; reordering swaps which file gets which color
@@ -272,6 +328,90 @@ function addPattern(color, id, angle=45, density=10, strokeWidth=2) {
   return id;
 }
 
+
+// Build projection by mode
+function makeProjection(mode, width, height, fitFeature=null) {
+  const pad = 20;
+  if (mode === 'globe') {
+    return d3.geoOrthographic()
+      .translate([width/2, height/2])
+      .scale(Math.min(width, height) * 0.45)
+      .clipAngle(90)
+      .precision(0.1);
+  }
+  // flat map: use existing logic for mercator/robinson
+  const projName = document.getElementById('proj')?.value || 'robinson';
+  const p = (projName === 'mercator') ? d3.geoMercator() : d3.geoRobinson();
+  const target = fitFeature || worldFC;
+  return p.fitExtent([[pad,pad],[width-pad,height-pad]], target);
+}
+
+// Hemisphere rotation for globe
+function setHemisphere(lon, lat=0) {
+  if (viewMode !== 'globe') return;
+  const r = [-lon, -lat, 0];
+  projection.rotate(r);
+  refreshPaths();
+}
+
+// Auto-spin
+function spinLoop() {
+  if (!autoSpin || viewMode !== 'globe') return;
+  const r = projection.rotate();
+  projection.rotate([ r[0] + 0.15, r[1], r[2] ]); // deg/frame
+  refreshPaths();
+  spinRAF = requestAnimationFrame(spinLoop);
+}
+
+// Refresh all path 'd' with current projection
+function refreshPaths() {
+  const path = d3.geoPath(projection);
+  // sphere & graticule
+  if (!sphereLayer.empty()) {
+    spherePath.attr('d', path({type:'Sphere'}));
+    gratPath.attr('d', path(graticule10));
+  }
+  // update every drawn geometry (countries, hatches, states) if feature is saved
+  d3.selectAll('path.geo, path.hatch, path.state').each(function(d){
+    const feat = this.__feature__ || d;
+    if (feat) d3.select(this).attr('d', path(feat));
+  });
+}
+
+// one-time sphere/graticule setup
+const sphereLayer = g.append('g').attr('class','sphere-layer').style('display','none');
+const spherePath = sphereLayer.append('path').attr('class','sphere');
+const gratPath = sphereLayer.append('path').attr('class','graticule');
+const graticule10 = d3.geoGraticule10();
+
+// Drag to rotate globe
+const drag = d3.drag().on('drag', (event) => {
+  if (viewMode !== 'globe') return;
+  const r = projection.rotate();
+  const sens = 0.25 / (projection.scale()/250);
+  const lon = r[0] + event.dx * sens;
+  const lat = Math.max(-90, Math.min(90, r[1] - event.dy * sens));
+  projection.rotate([lon, lat, r[2]]);
+  refreshPaths();
+});
+svg.call(drag);
+
+// Hemisphere buttons & spin toggle
+document.addEventListener('click', (ev) => {
+  const id = ev.target?.id;
+  if (id === 'hemi-americas') setHemisphere(-90, 0);
+  if (id === 'hemi-euraf')   setHemisphere( 10, 0);
+  if (id === 'hemi-asia')    setHemisphere(120, 0);
+  if (id === 'hemi-n')       setHemisphere(  0, 60);
+  if (id === 'hemi-s')       setHemisphere(  0,-60);
+});
+document.addEventListener('change', (ev) => {
+  if (ev.target?.id === 'spin') {
+    autoSpin = ev.target.checked;
+    if (autoSpin) spinLoop(); else cancelAnimationFrame(spinRAF);
+  }
+});
+
 document.getElementById('render').onclick = async () => {
   if (!worldFC || !usFC) { log('Basemap not ready yet…'); return; }
   const projName = document.getElementById('proj').value;
@@ -356,10 +496,19 @@ document.getElementById('render').onclick = async () => {
     fitFeature = { type:'FeatureCollection', features: fitFeatures };
   }
 
+  // View mode (fallback to map if control missing)
+  viewMode = (document.getElementById('viewMode')?.value) || 'map';
   const width = parseFloat(svg.attr('width'));
   const height = parseFloat(svg.attr('height'));
-  const proj = getProjection(projName, width, height, fitFeature);
-  const path = d3.geoPath(proj);
+  // For globe, ignore fitFeature (full sphere). For map, pass fitFeature if any.
+  let fitArg = (viewMode === 'globe') ? null : fitFeature;
+  projection = makeProjection(viewMode, width, height, fitArg);
+  const path = d3.geoPath(projection);
+  sphereLayer.style('display', viewMode === 'globe' ? null : 'none');
+  if (viewMode === 'globe') {
+    spherePath.attr('d', path({type:'Sphere'}));
+    gratPath.attr('d', path(graticule10));
+  }
 
   // Draw base country fills
   worldFC.features.forEach(f => {
@@ -373,6 +522,7 @@ document.getElementById('render').onclick = async () => {
         .attr('class','geo country')
         .attr('data-groups','')
         .attr('d', path(f))
+        .each(function(){ this.__feature__ = f; })
         .attr('fill', '#0f1116')
         .attr('stroke', '#999')
         .attr('stroke-width', 0.7)
@@ -382,6 +532,7 @@ document.getElementById('render').onclick = async () => {
         .attr('class','geo country')
         .attr('data-groups', arr.join(','))
         .attr('d', path({type:"Feature", geometry: geom}))
+        .each(function(){ this.__feature__ = {type:'Feature', geometry: geom}; })
         .attr('fill', fill)
         .attr('stroke', '#999')
         .attr('stroke-width', 0.7)
@@ -400,6 +551,7 @@ document.getElementById('render').onclick = async () => {
         .attr('class','geo hatch')
         .attr('data-groups', arr.join(','))
         .attr('d', path({type:"Feature", geometry: geom}))
+        .each(function(){ this.__feature__ = {type:'Feature', geometry: geom}; })
         .attr('fill', `url(#hatch-slash-${c2.replace('#','')})`)
         .attr('stroke','none');
     }
@@ -409,6 +561,7 @@ document.getElementById('render').onclick = async () => {
         .attr('class','geo hatch')
         .attr('data-groups', arr.join(','))
         .attr('d', path({type:"Feature", geometry: geom}))
+        .each(function(){ this.__feature__ = {type:'Feature', geometry: geom}; })
         .attr('fill', `url(#hatch-back-${c3.replace('#','')})`)
         .attr('stroke','none');
     }
@@ -417,6 +570,7 @@ document.getElementById('render').onclick = async () => {
         .attr('class','geo hatch')
         .attr('data-groups', arr.join(','))
         .attr('d', path({type:"Feature", geometry: geom}))
+        .each(function(){ this.__feature__ = {type:'Feature', geometry: geom}; })
         .attr('fill','url(#hatch-dots)')
         .attr('stroke','none');
     }
@@ -447,6 +601,7 @@ document.getElementById('render').onclick = async () => {
         .attr('class','geo state')
         .attr('data-groups','states')
         .attr('d', path(f))
+        .each(function(){ this.__feature__ = f; })
         .attr('fill', '#4e79a7')
         .attr('opacity', 0.9)
         .attr('stroke','none');
@@ -500,6 +655,8 @@ document.getElementById('render').onclick = async () => {
   const issues = [];
   if (unmatchedC.size) issues.push(`Unmatched countries: ${Array.from(unmatchedC).join(', ')}`);
   if (statesFile && statesCount===0) issues.push(`No U.S. states matched. Use full names or USPS codes (e.g., CA, NY, WI).`);
+  // Ensure __feature__ is set on all paths for globe rotation refresh
+  svg.selectAll('path.geo, path.hatch, path.state').each(function(d){ if (!this.__feature__) this.__feature__ = d; });
   log(issues.length ? issues.join(' | ') : 'Rendered.');
 };
 
