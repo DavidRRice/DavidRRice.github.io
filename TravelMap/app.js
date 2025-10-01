@@ -302,19 +302,46 @@ function buildNameIndex(features) {
   }
   return idx;
 }
-// Keep only largest polygon (approx mainland) to drop outliers
-function largestPolygon(geom) {
+
+// Keep mainland + nearby islands; drop only far-flung territories
+function filterOutlyingPolygons(geom, maxKm = 1000, minAreaShare = 0.01) {
   if (!geom) return geom;
   if (geom.type === "Polygon") return geom;
   if (geom.type !== "MultiPolygon") return geom;
-  let best = null, bestA = -1;
+
+  // 1) Find the mainland polygon by area
+  let mainland = null, maxA = -1, totalA = 0;
+  const polys = [];
   for (const poly of geom.coordinates) {
     const g = { type: "Polygon", coordinates: poly };
     const a = d3.geoArea(g);
-    if (a > bestA) { bestA = a; best = g; }
+    totalA += a;
+    polys.push({ g, a });
+    if (a > maxA) { maxA = a; mainland = g; }
   }
-  return best || geom;
+  if (!mainland) return geom;
+
+  // 2) Mainland centroid
+  const mc = d3.geoCentroid(mainland);
+
+  // 3) Keep polygons that are either:
+  //   - within maxKm of the mainland centroid, OR
+  //   - large enough by area share (avoid dropping big islands like Greenland, etc.)
+  const R = 6371; // km
+  const kept = [];
+  for (const { g, a } of polys) {
+    const c = d3.geoCentroid(g);
+    const km = d3.geoDistance(mc, c) * R;
+    const share = a / totalA;
+    if (km <= maxKm || share >= minAreaShare) {
+      kept.push(g);
+    }
+  }
+
+  if (kept.length === 1) return kept[0]; // simple polygon
+  return { type: "MultiPolygon", coordinates: kept.map(p => p.coordinates) };
 }
+
 function addPattern(color, id, angle=45, density=10, strokeWidth=2) {
   const defs = svg.select('defs').empty() ? svg.append('defs') : svg.select('defs');
   if (!svg.select(`#${id}`).empty()) return id;
@@ -487,7 +514,7 @@ document.getElementById('render').onclick = async () => {
     const key = normalize(f.properties?.name || f.properties?.NAME || '');
     const owner = baseOwner.get(key);
     let geom = f.geometry;
-    if (!includeOutliers) geom = largestPolygon(geom);
+    if (!includeOutliers) geom = filterOutlyingPolygons(geom, 1000, 0.01);
     if (owner==null) return;
     fitFeatures.push({type:"Feature", geometry: geom, properties:{}});
   });
@@ -515,7 +542,7 @@ document.getElementById('render').onclick = async () => {
     const key = normalize(f.properties?.name || f.properties?.NAME || '');
     const owner = baseOwner.get(key);
     let geom = f.geometry;
-    if (!includeOutliers) geom = largestPolygon(geom);
+    if (!includeOutliers) geom = filterOutlyingPolygons(geom, 1000, 0.01);
     const fill = (owner==null) ? '#0f1116' : groups[owner].color;
     if (owner==null) {
       g.append('path')
@@ -544,7 +571,7 @@ document.getElementById('render').onclick = async () => {
     const f = nameIndex.get(key);
     if (!f) return;
     let geom = f.geometry;
-    if (!includeOutliers) geom = largestPolygon(geom);
+    if (!includeOutliers) geom = filterOutlyingPolygons(geom, 1000, 0.01);
     if (arr.length >= 2) {
       const c2 = groups[arr[1]].color;
       g.append('path')
