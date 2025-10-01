@@ -12,6 +12,10 @@ const PALETTES = {
   3: ["#abdda4", "#fdae61", "#d7191c", "#7570b3", "#2b83ba", "#66c2a5"],
 };
 
+// Max great-circle distance (km) to keep polygons near the country's core when excluding outliers
+const OUTLIER_MAX_KM = 1200; // tuned to keep Sicily/Tasmania/Cyprus, exclude Greenland/French Guiana/Alaska/Hawaii
+
+
 // ISO3 -> canonical English name (broad but not 100% exhaustive)
 const ISO3_TO_NAME = {
   AFG:"Afghanistan", ALB:"Albania", DZA:"Algeria", AND:"Andorra", AGO:"Angola", ATG:"Antigua and Barbuda",
@@ -302,46 +306,47 @@ function buildNameIndex(features) {
   }
   return idx;
 }
-
-// Keep mainland + nearby islands; drop only far-flung territories
-function filterOutlyingPolygons(geom, maxKm = 1000, minAreaShare = 0.01) {
+// Keep only largest polygon (approx mainland) to drop outliers
+function largestPolygon(geom) {
   if (!geom) return geom;
   if (geom.type === "Polygon") return geom;
   if (geom.type !== "MultiPolygon") return geom;
-
-  // 1) Find the mainland polygon by area
-  let mainland = null, maxA = -1, totalA = 0;
-  const polys = [];
+  let best = null, bestA = -1;
   for (const poly of geom.coordinates) {
     const g = { type: "Polygon", coordinates: poly };
     const a = d3.geoArea(g);
-    totalA += a;
-    polys.push({ g, a });
-    if (a > maxA) { maxA = a; mainland = g; }
+    if (a > bestA) { bestA = a; best = g; }
   }
-  if (!mainland) return geom;
+  return best || geom;
 
-  // 2) Mainland centroid
-  const mc = d3.geoCentroid(mainland);
-
-  // 3) Keep polygons that are either:
-  //   - within maxKm of the mainland centroid, OR
-  //   - large enough by area share (avoid dropping big islands like Greenland, etc.)
-  const R = 6371; // km
+// Keep a cluster of polygons near the core (medoid) up to maxKm; robust against huge overseas territories
+function filterPolysByDistance(geom, maxKm=OUTLIER_MAX_KM) {
+  if (!geom) return geom;
+  if (geom.type === "Polygon") return geom;
+  if (geom.type !== "MultiPolygon") return geom;
+  const polys = geom.coordinates.map(poly => ({ type:"Polygon", coordinates: poly }));
+  // Compute centroids
+  const cents = polys.map(g => d3.geoCentroid(g));
+  // Find medoid: polygon with minimal total distance to others
+  const R = 6371;
+  const dist = (a,b) => d3.geoDistance(a,b) * R;
+  let bestIdx = 0, bestSum = Infinity;
+  for (let i=0;i<cents.length;i++){
+    let s = 0;
+    for (let j=0;j<cents.length;j++) if (i!==j) s += dist(cents[i], cents[j]);
+    if (s < bestSum) { bestSum = s; bestIdx = i; }
+  }
+  const core = cents[bestIdx];
   const kept = [];
-  for (const { g, a } of polys) {
-    const c = d3.geoCentroid(g);
-    const km = d3.geoDistance(mc, c) * R;
-    const share = a / totalA;
-    if (km <= maxKm || share >= minAreaShare) {
-      kept.push(g);
-    }
+  for (let i=0;i<polys.length;i++){
+    const dkm = dist(core, cents[i]);
+    if (dkm <= maxKm) kept.push(polys[i].coordinates);
   }
-
-  if (kept.length === 1) return kept[0]; // simple polygon
-  return { type: "MultiPolygon", coordinates: kept.map(p => p.coordinates) };
+  if (kept.length === 0) kept.push(polys[bestIdx].coordinates);
+  return kept.length === 1 ? { type:"Polygon", coordinates: kept[0] }
+                           : { type:"MultiPolygon", coordinates: kept };
 }
-
+}
 function addPattern(color, id, angle=45, density=10, strokeWidth=2) {
   const defs = svg.select('defs').empty() ? svg.append('defs') : svg.select('defs');
   if (!svg.select(`#${id}`).empty()) return id;
@@ -514,7 +519,7 @@ document.getElementById('render').onclick = async () => {
     const key = normalize(f.properties?.name || f.properties?.NAME || '');
     const owner = baseOwner.get(key);
     let geom = f.geometry;
-    if (!includeOutliers) geom = filterOutlyingPolygons(geom, 1000, 0.01);
+    if (!includeOutliers) geom = filterPolysByDistance(geom, OUTLIER_MAX_KM);
     if (owner==null) return;
     fitFeatures.push({type:"Feature", geometry: geom, properties:{}});
   });
@@ -542,7 +547,7 @@ document.getElementById('render').onclick = async () => {
     const key = normalize(f.properties?.name || f.properties?.NAME || '');
     const owner = baseOwner.get(key);
     let geom = f.geometry;
-    if (!includeOutliers) geom = filterOutlyingPolygons(geom, 1000, 0.01);
+    if (!includeOutliers) geom = filterPolysByDistance(geom, OUTLIER_MAX_KM);
     const fill = (owner==null) ? '#0f1116' : groups[owner].color;
     if (owner==null) {
       g.append('path')
@@ -571,7 +576,7 @@ document.getElementById('render').onclick = async () => {
     const f = nameIndex.get(key);
     if (!f) return;
     let geom = f.geometry;
-    if (!includeOutliers) geom = filterOutlyingPolygons(geom, 1000, 0.01);
+    if (!includeOutliers) geom = filterPolysByDistance(geom, OUTLIER_MAX_KM);
     if (arr.length >= 2) {
       const c2 = groups[arr[1]].color;
       g.append('path')
@@ -635,8 +640,8 @@ document.getElementById('render').onclick = async () => {
     });
     // Haloed boundaries for readability
     const b = topojson.mesh(usTopo, usTopo.objects.states, (a,b)=>a!==b);
-    g.append('path').attr('d', path(b)).attr('fill','none').attr('stroke','#000').attr('stroke-width',1.3).attr('opacity',0.8);
-    g.append('path').attr('d', path(b)).attr('fill','none').attr('stroke','#fff').attr('stroke-width',0.7).attr('opacity',0.9);
+    g.append('path').attr('class','state outline halo').attr('d', path(b)).each(function(){ this.__feature__ = b; }).attr('fill','none').attr('stroke','#000').attr('stroke-width',1.3).attr('opacity',0.8);
+    g.append('path').attr('class','state outline').attr('d', path(b)).each(function(){ this.__feature__ = b; }).attr('fill','none').attr('stroke','#fff').attr('stroke-width',0.7).attr('opacity',0.9);
   }
 
   // Legend with counts (unique per list)
