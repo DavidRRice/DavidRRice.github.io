@@ -12,10 +12,6 @@ const PALETTES = {
   3: ["#abdda4", "#fdae61", "#d7191c", "#7570b3", "#2b83ba", "#66c2a5"],
 };
 
-// Max great-circle distance (km) to keep polygons near the country's core when excluding outliers
-const OUTLIER_MAX_KM = 1200; // tuned to keep Sicily/Tasmania/Cyprus, exclude Greenland/French Guiana/Alaska/Hawaii
-
-
 // ISO3 -> canonical English name (broad but not 100% exhaustive)
 const ISO3_TO_NAME = {
   AFG:"Afghanistan", ALB:"Albania", DZA:"Algeria", AND:"Andorra", AGO:"Angola", ATG:"Antigua and Barbuda",
@@ -81,8 +77,10 @@ const g = svg.append('g');
 const legend = d3.select('#legend');
 const logEl = d3.select('#log');
 
-let worldTopo, worldFC, usTopo, usFC;
+let worldTopo, worldFC, usTopo, usFC, FG_POLYS;
 // === Globe / View mode additions ===
+let zoomBehavior;
+let mapTransform = d3.zoomIdentity;
 let viewMode = 'map';           // 'map' | 'globe'
 let projection;                 // active d3 projection
 let spinRAF = null;
@@ -101,6 +99,17 @@ let autoSpin = false;
       <option value="map">Flat map</option>
       <option value="globe">Globe (orthographic)</option>
     </select>
+    <span class="zoom-ctr" style="margin-left:.5rem">
+      <button id="zoom-in" title="Zoom in" aria-label="Zoom in">+</button>
+      <button id="zoom-out" title="Zoom out" aria-label="Zoom out">−</button>
+      <span class="pan-ctr" style="margin-left:.25rem">
+        <button id="pan-up" title="Pan up/Rotate north">↑</button>
+        <button id="pan-left" title="Pan left/Rotate west">←</button>
+        <button id="pan-right" title="Pan right/Rotate east">→</button>
+        <button id="pan-down" title="Pan down/Rotate south">↓</button>
+        <button id="reset-view" title="Reset view">⟲</button>
+      </span>
+    </span>
     <span class="hemi-set" style="margin-left:.5rem">
       <label>Hemisphere</label>
       <button id="hemi-americas" aria-label="Americas">Americas</button>
@@ -125,6 +134,9 @@ let autoSpin = false;
       /* Default hide hemisphere & spin until globe is chosen */
       .hemi-set, #spin { display: none; }
       body.globe-mode .hemi-set, body.globe-mode #spin { display: inline-block; }
+      .zoom-ctr { display:inline-flex; gap:.25rem; align-items:center; }
+      .zoom-ctr button { padding:.25rem .5rem; border-radius:6px; }
+      .pan-ctr button { padding:.2rem .45rem; border-radius:6px; }
     `;
     document.head.appendChild(css);
   }
@@ -318,34 +330,36 @@ function largestPolygon(geom) {
     if (a > bestA) { bestA = a; best = g; }
   }
   return best || geom;
-
-// Keep a cluster of polygons near the core (medoid) up to maxKm; robust against huge overseas territories
-function filterPolysByDistance(geom, maxKm=OUTLIER_MAX_KM) {
-  if (!geom) return geom;
-  if (geom.type === "Polygon") return geom;
-  if (geom.type !== "MultiPolygon") return geom;
-  const polys = geom.coordinates.map(poly => ({ type:"Polygon", coordinates: poly }));
-  // Compute centroids
-  const cents = polys.map(g => d3.geoCentroid(g));
-  // Find medoid: polygon with minimal total distance to others
-  const R = 6371;
-  const dist = (a,b) => d3.geoDistance(a,b) * R;
-  let bestIdx = 0, bestSum = Infinity;
-  for (let i=0;i<cents.length;i++){
-    let s = 0;
-    for (let j=0;j<cents.length;j++) if (i!==j) s += dist(cents[i], cents[j]);
-    if (s < bestSum) { bestSum = s; bestIdx = i; }
-  }
-  const core = cents[bestIdx];
-  const kept = [];
-  for (let i=0;i<polys.length;i++){
-    const dkm = dist(core, cents[i]);
-    if (dkm <= maxKm) kept.push(polys[i].coordinates);
-  }
-  if (kept.length === 0) kept.push(polys[bestIdx].coordinates);
-  return kept.length === 1 ? { type:"Polygon", coordinates: kept[0] }
-                           : { type:"MultiPolygon", coordinates: kept };
 }
+
+/** Permanently remove French Guiana from France; keep Corsica etc.
+ *  Also queue removed polygon(s) into FG_POLYS for a dark base overlay so coast looks continuous. */
+function stripFrenchGuianaIfFrance(nameKey, geom){
+  const k = (nameKey||'').toLowerCase();
+  if (k !== 'france') return geom;
+  try{
+    if (!geom || (geom.type!=='Polygon' && geom.type!=='MultiPolygon')) return geom;
+    const polys = (geom.type==='Polygon') ? [geom.coordinates] : geom.coordinates;
+    function isFG(coords){
+      // centroid-in-bbox around French Guiana ~ lon [-55,-50], lat [1,8]
+      let sx=0, sy=0, n=0;
+      const ring = coords[0] || [];
+      for (const pt of ring){ const x=pt[0], y=pt[1]; if (typeof x==='number' && typeof y==='number'){ sx+=x; sy+=y; n++; } }
+      if (n===0) return false;
+      const cx=sx/n, cy=sy/n;
+      return (cx>-55 && cx<-50 && cy>1 && cy<8);
+    }
+    const removed = polys.filter(p => isFG(p));
+    if (Array.isArray(FG_POLYS)) {
+      for (const rp of removed){
+        FG_POLYS.push({ type:'Feature', geometry:{ type:'Polygon', coordinates: rp } });
+      }
+    }
+    const kept = polys.filter(p => !isFG(p));
+    if (kept.length===0) return geom;
+    if (kept.length===1) return {type:'Polygon', coordinates: kept[0]};
+    return {type:'MultiPolygon', coordinates: kept};
+  }catch(e){ return geom; }
 }
 function addPattern(color, id, angle=45, density=10, strokeWidth=2) {
   const defs = svg.select('defs').empty() ? svg.append('defs') : svg.select('defs');
@@ -398,6 +412,8 @@ function spinLoop() {
 // Refresh all path 'd' with current projection
 function refreshPaths() {
   const path = d3.geoPath(projection);
+  /*apply-map-transform*/
+  if (viewMode === 'map') { g.attr('transform', mapTransform); } else { g.attr('transform', null); }
   // sphere & graticule
   if (!sphereLayer.empty()) {
     spherePath.attr('d', path({type:'Sphere'}));
@@ -417,7 +433,9 @@ const gratPath = sphereLayer.append('path').attr('class','graticule');
 const graticule10 = d3.geoGraticule10();
 
 // Drag to rotate globe
-const drag = d3.drag().on('drag', (event) => {
+const drag = d3.drag()
+  .filter((event)=> viewMode === 'globe' && !event.button)
+  .on('drag', (event) => {
   if (viewMode !== 'globe') return;
   const r = projection.rotate();
   const sens = 0.25 / (projection.scale()/250);
@@ -428,9 +446,63 @@ const drag = d3.drag().on('drag', (event) => {
 });
 svg.call(drag);
 
+// D3 zoom for flat map (drag to pan, wheel to zoom). Disabled in globe mode.
+function setupZoom(){
+  if (zoomBehavior) svg.on('.zoom', null);
+  zoomBehavior = d3.zoom()
+    .filter((event) => {
+      if (viewMode !== 'map') return false;
+      if (event.target && event.target.closest('input,select,button')) return false;
+      // allow wheel + normal drags
+      return (!event.ctrlKey || event.type === 'wheel');
+    })
+    .scaleExtent([0.5, 12])
+    // ↓↓↓ add this block ↓↓↓
+    .wheelDelta((event) => {
+      // Normalize wheel across mice vs. trackpads
+      const dy = (event.deltaMode === 1 ? event.deltaY * 16 : event.deltaY);
+      // Smaller magnitude => gentler zoom (try -0.0010 to -0.0008)
+      return -dy * 0.0006;
+    })
+    // ↑↑↑ add this block ↑↑↑
+    .on('zoom', (event) => {
+      if (viewMode === 'map') {
+        mapTransform = event.transform;
+        g.attr('transform', mapTransform);
+      }
+    });
+  svg.call(zoomBehavior).on('dblclick.zoom', null);
+}
+setupZoom();
+
+// Mouse wheel zoom for globe (adjust orthographic scale)
+svg.on('wheel.globezoom', (event) => {
+  if (viewMode !== 'globe') return;
+  event.preventDefault();
+  const k = (event.deltaY < 0) ? 1.05 : 0.95;
+  projection.scale(projection.scale() * k);
+  refreshPaths();
+}, { passive:false });
+
 // Hemisphere buttons & spin toggle
 document.addEventListener('click', (ev) => {
   const id = ev.target?.id;
+  if (id === 'zoom-in') {
+    if (viewMode === 'map') { svg.interrupt(); svg.call(zoomBehavior.scaleBy, 1.02); }
+    else { projection.scale(projection.scale()*1.02); refreshPaths(); }
+  }
+  if (id === 'zoom-out') {
+    if (viewMode === 'map') { svg.interrupt(); svg.call(zoomBehavior.scaleBy, 1/1.02); }
+    else { projection.scale(projection.scale()/1.02); refreshPaths(); }
+  }
+  if (id === 'pan-left') { if (viewMode === 'map') svg.transition().duration(150).call(zoomBehavior.translateBy, 5, 0); else { const r=projection.rotate(); projection.rotate([r[0]+2, r[1], r[2]]); refreshPaths(); } }
+  if (id === 'pan-right'){ if (viewMode === 'map') svg.transition().duration(150).call(zoomBehavior.translateBy, -5, 0); else { const r=projection.rotate(); projection.rotate([r[0]-2, r[1], r[2]]); refreshPaths(); } }
+  if (id === 'pan-up')   { if (viewMode === 'map') svg.transition().duration(150).call(zoomBehavior.translateBy, 0, 5); else { const r=projection.rotate(); projection.rotate([r[0], Math.max(-90, r[1]-2), r[2]]); refreshPaths(); } }
+  if (id === 'pan-down') { if (viewMode === 'map') svg.transition().duration(150).call(zoomBehavior.translateBy, 0, -5); else { const r=projection.rotate(); projection.rotate([r[0], Math.min(90, r[1]+2), r[2]]); refreshPaths(); } }
+  if (id === 'reset-view') {
+    if (viewMode === 'map') { mapTransform = d3.zoomIdentity; svg.transition().duration(200).call(zoomBehavior.transform, d3.zoomIdentity); g.attr('transform', null); }
+    else { projection.scale(Math.min(parseFloat(svg.attr('width')), parseFloat(svg.attr('height'))) * 0.45); projection.rotate([0,0,0]); refreshPaths(); }
+  }
   if (id === 'hemi-americas') setHemisphere(-90, 0);
   if (id === 'hemi-euraf')   setHemisphere( 10, 0);
   if (id === 'hemi-asia')    setHemisphere(120, 0);
@@ -449,7 +521,7 @@ document.getElementById('render').onclick = async () => {
   const projName = document.getElementById('proj').value;
   const pal = palettes();
   const doZoom = document.getElementById('zoom').checked;
-  const includeOutliers = document.getElementById('outliers').checked;
+  const includeOutliers = true;
   const files = Array.from(document.getElementById('files').files); // raw (fallback only)
   const statesFile = document.getElementById('statesFile').files[0] || null;
   if (!files.length) { log('Please upload one or more country lists (.txt).'); return; }
@@ -495,6 +567,7 @@ document.getElementById('render').onclick = async () => {
   const baseOwner = new Map([...membership.entries()].map(([k, arr]) => [k, arr[0]]));
 
   g.selectAll('*').remove();
+  FG_POLYS = [];
   legend.selectAll('*').remove();
   svg.select('defs').remove();
 
@@ -519,7 +592,7 @@ document.getElementById('render').onclick = async () => {
     const key = normalize(f.properties?.name || f.properties?.NAME || '');
     const owner = baseOwner.get(key);
     let geom = f.geometry;
-    if (!includeOutliers) geom = filterPolysByDistance(geom, OUTLIER_MAX_KM);
+    geom = stripFrenchGuianaIfFrance(key, geom);
     if (owner==null) return;
     fitFeatures.push({type:"Feature", geometry: geom, properties:{}});
   });
@@ -536,6 +609,8 @@ document.getElementById('render').onclick = async () => {
   let fitArg = (viewMode === 'globe') ? null : fitFeature;
   projection = makeProjection(viewMode, width, height, fitArg);
   const path = d3.geoPath(projection);
+  /*apply-map-transform*/
+  if (viewMode === 'map') { g.attr('transform', mapTransform); } else { g.attr('transform', null); }
   sphereLayer.style('display', viewMode === 'globe' ? null : 'none');
   if (viewMode === 'globe') {
     spherePath.attr('d', path({type:'Sphere'}));
@@ -547,7 +622,7 @@ document.getElementById('render').onclick = async () => {
     const key = normalize(f.properties?.name || f.properties?.NAME || '');
     const owner = baseOwner.get(key);
     let geom = f.geometry;
-    if (!includeOutliers) geom = filterPolysByDistance(geom, OUTLIER_MAX_KM);
+    geom = stripFrenchGuianaIfFrance(key, geom);
     const fill = (owner==null) ? '#0f1116' : groups[owner].color;
     if (owner==null) {
       g.append('path')
@@ -576,7 +651,7 @@ document.getElementById('render').onclick = async () => {
     const f = nameIndex.get(key);
     if (!f) return;
     let geom = f.geometry;
-    if (!includeOutliers) geom = filterPolysByDistance(geom, OUTLIER_MAX_KM);
+    geom = stripFrenchGuianaIfFrance(key, geom);
     if (arr.length >= 2) {
       const c2 = groups[arr[1]].color;
       g.append('path')
@@ -608,7 +683,16 @@ document.getElementById('render').onclick = async () => {
     }
   });
 
-  // US states overlay
+  
+  // Draw French Guiana as dark base fill so SVG/PNG match (stroke via .country CSS)
+  (FG_POLYS||[]).forEach(f => {
+    g.append('path')
+      .attr('class','geo country extra-outline')
+      .attr('d', path(f))
+      .each(function(){ this.__feature__ = f; })
+      .attr('fill', '#0f1116'); // match unowned base fill
+  });
+// US states overlay
   let statesSel = [];
   let statesCount = 0;
   if (statesFile) {
@@ -640,8 +724,8 @@ document.getElementById('render').onclick = async () => {
     });
     // Haloed boundaries for readability
     const b = topojson.mesh(usTopo, usTopo.objects.states, (a,b)=>a!==b);
-    g.append('path').attr('class','state outline halo').attr('d', path(b)).each(function(){ this.__feature__ = b; }).attr('fill','none').attr('stroke','#000').attr('stroke-width',1.3).attr('opacity',0.8);
-    g.append('path').attr('class','state outline').attr('d', path(b)).each(function(){ this.__feature__ = b; }).attr('fill','none').attr('stroke','#fff').attr('stroke-width',0.7).attr('opacity',0.9);
+    g.append('path').attr('d', path(b)).attr('fill','none').attr('stroke','#000').attr('stroke-width',1.3).attr('opacity',0.8);
+    g.append('path').attr('d', path(b)).attr('fill','none').attr('stroke','#fff').attr('stroke-width',0.7).attr('opacity',0.9);
   }
 
   // Legend with counts (unique per list)
@@ -770,3 +854,68 @@ document.getElementById('downloadJPG').onclick = () => {
   img.onerror = () => URL.revokeObjectURL(url);
   img.src = url;
 };
+
+// Ensure zoom handlers align with view mode
+document.addEventListener('change', (ev) => {
+  if (ev.target?.id === 'viewMode') {
+    if (ev.target.value === 'globe') {
+      mapTransform = d3.zoomIdentity;
+      g.attr('transform', null);
+      svg.on('.zoom', null);
+    } else {
+      setupZoom();
+    }
+  }
+});
+
+// Press-and-hold support for pan/rotate/zoom buttons (with click suppression)
+function setupHoldButtons(){
+  const holdables = [
+    ['pan-left',  () => { if (viewMode==='map') { svg.interrupt(); svg.call(zoomBehavior.translateBy,  5,  0); }
+                          else { const r=projection.rotate(); projection.rotate([r[0]+1, r[1], r[2]]); refreshPaths(); } }],
+    ['pan-right', () => { if (viewMode==='map') { svg.interrupt(); svg.call(zoomBehavior.translateBy, -5,  0); }
+                          else { const r=projection.rotate(); projection.rotate([r[0]-1, r[1], r[2]]); refreshPaths(); } }],
+    ['pan-up',    () => { if (viewMode==='map') { svg.interrupt(); svg.call(zoomBehavior.translateBy,  0,  5); }
+                          else { const r=projection.rotate(); projection.rotate([r[0], Math.max(-90, r[1]-1), r[2]]); refreshPaths(); } }],
+    ['pan-down',  () => { if (viewMode==='map') { svg.interrupt(); svg.call(zoomBehavior.translateBy,  0, -5); }
+                          else { const r=projection.rotate(); projection.rotate([r[0], Math.min( 90, r[1]+1), r[2]]); refreshPaths(); } }],
+    ['zoom-in',   () => { if (viewMode==='map') { svg.interrupt(); svg.call(zoomBehavior.scaleBy, 1.01); }
+                          else { projection.scale(projection.scale()*1.01); refreshPaths(); } }],
+    ['zoom-out',  () => { if (viewMode==='map') { svg.interrupt(); svg.call(zoomBehavior.scaleBy, 1/1.01); }
+                          else { projection.scale(projection.scale()/1.01); refreshPaths(); } }],
+  ];
+
+  holdables.forEach(([id, step]) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+
+    let timer = null;
+    let held = false;
+
+    const start = () => {
+      held = true;
+      step(); // immediate response
+      if (timer) clearInterval(timer);
+      timer = setInterval(step, 30); // smooth, continuous
+    };
+
+    const stop = () => {
+      if (timer) { clearInterval(timer); timer = null; }
+      // Defer clearing 'held' so the ensuing click (from mouseup) is ignored
+      setTimeout(() => { held = false; }, 0);
+    };
+
+    el.addEventListener('mousedown', start);
+    el.addEventListener('touchstart', (e)=>{ e.preventDefault(); start(); }, { passive: false });
+    ['mouseup','mouseleave','mouseout','touchend','touchcancel','blur'].forEach(evt => {
+      el.addEventListener(evt, stop);
+    });
+
+    // Only trigger a single step on click if we were NOT holding
+    el.addEventListener('click', (e) => {
+      if (held) { e.preventDefault(); e.stopPropagation(); return; }
+      step();
+    });
+  });
+}
+document.addEventListener('DOMContentLoaded', setupHoldButtons);

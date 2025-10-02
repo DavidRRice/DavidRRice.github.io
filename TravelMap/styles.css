@@ -142,7 +142,32 @@ li pre {
 }
 
 .country {
-  stroke: #aaa;          /* darker outline */
+  stroke: #333;          /* darker outline */
   stroke-width: 0.8px;   /* a little thicker */
   stroke-opacity: 0.9;   /* nearly solid */
 }
+
+.zoom-ctr {
+  display: inline-flex;
+  gap: .25rem;
+  align-items: center;
+  margin-left: .5rem;
+}
+.zoom-ctr button,
+.pan-ctr button {
+  padding: .25rem .5rem;
+  border-radius: 6px;
+  border: 1px solid var(--border, #999);
+  background: var(--panel, #f8f8f8);
+  cursor: pointer;
+  line-height: 1;
+}
+.zoom-ctr button:hover,
+.pan-ctr button:hover {
+  background: var(--hover, #e9e9e9);
+}
+
+/* optional: nicer “hold” feel */
+.zoom-ctr button, .pan-ctr button { user-select: none; }
+#map { cursor: grab; }
+#map:active { cursor: grabbing; 

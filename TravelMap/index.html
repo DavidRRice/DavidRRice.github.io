@@ -45,9 +45,6 @@
       <label>Zoom to selected
         <input type="checkbox" id="zoom" checked>
       </label>
-      <label>Include outlying territories
-        <input type="checkbox" id="outliers" checked>
-      </label>
     </div>
     <div class="row">
       <label>Country list(s)
@@ -57,7 +54,7 @@
         <input id="statesFile" type="file" accept=".txt">
       </label>
       </div>
-	    <div class="view-switch">
+      <div class="view-switch">
   <label>View</label>
   <select id="viewMode" aria-label="Switch map view">
     <option value="map">Flat map</option>
@@ -94,7 +91,19 @@
   <div id="listsPanel" class="lists-panel"></div>
 </section>
 
+
   <main>
+    <span class="zoom-ctr">
+    <button id="zoom-in" aria-label="Zoom in">+</button>
+    <button id="zoom-out" aria-label="Zoom out">−</button>
+    <span class="pan-ctr">
+      <button id="pan-up" title="Pan up/Rotate north">↑</button>
+      <button id="pan-left" title="Pan left/Rotate west">←</button>
+      <button id="pan-right" title="Pan right/Rotate east">→</button>
+      <button id="pan-down" title="Pan down/Rotate south">↓</button>
+      <button id="reset-view" title="Reset view">⟲</button>
+    </span>
+  </span>
     <svg id="map" width="1280" height="740" role="img" aria-label="Travel Map"></svg>
     <div id="legend"></div>
     <pre id="log"></pre>
