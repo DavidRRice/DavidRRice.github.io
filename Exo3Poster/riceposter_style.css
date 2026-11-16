@@ -1,0 +1,70 @@
+body {
+	margin: 0;
+	padding: 0;
+	color: #000000;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 16px;
+	line-height: 1.5em;
+	background-color: #FFFFFF;
+	background-image: url(PosterImage/geodarkbig.png);
+	background-repeat: repeat;
+	background-position: top center
+}
+
+.image_unlv img {
+	z-index: 1;
+	position: absolute;
+	bottom: 40px;
+	right: 40px;
+  	max-width: 13%;
+  	height: auto;
+}
+
+.right {
+	float: right;
+ 	padding: 0 10px 0 0;
+}
+
+.right1 {
+	float: right;
+ 	padding: 0 0 0 0;
+}
+
+.carousel-control {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 3%;  /* change this value to required width */
+  font-size: 30px;
+  color: #474747;
+  text-align: center;
+  text-shadow: 0 1px 1px rgba(142, 142, 142, 0.6);
+  background-color: rgba(101, 101, 101, 0);
+  filter: alpha(opacity=30);
+  opacity: .2;
+}
+
+.collapsible {
+  background-color: white;
+  color: black;
+  cursor: pointer;
+  padding: 14px;
+  width: 100%;
+  border: none;
+  text-align: left;
+  outline: none;
+  font-size: 15px;
+}
+
+.active, .collapsible:hover {
+  background-color: #c2c2c2;
+}
+
+.content {
+  padding: 0 18px;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.2s ease-out;
+  background-color: #white;
+}

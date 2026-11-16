@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /maintenance/
+
+Sitemap: https://davidrrice.github.io/sitemap.xml

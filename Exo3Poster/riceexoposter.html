@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta name="robots" content="noindex">
+<meta http-equiv='Content-Type' content='text/html; charset=UTF-8'>
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge'>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta name='author' content='David R. Rice'>
+<meta name='description' content='Scientific poster for the Exoplanets 3 online conference from July 27th-31st 2020 made by David R. Rice from the University of Nevada, Las Vegas on Magrathea a new planet structure solver for terrestrial planets'>
+<meta name="keywords" content='David Rice, David R. Rice, Poster, ExoplanetsIII, Exoplanets, Exoplanets 3, interiors, code, Las Vegas, Nevada, astronomy'>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML">
+</script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+<!--<link href="riceposter_style.css" rel="stylesheet" type="text/css" /> -->
+<!--<link href="riceposter_style.css" rel="stylesheet" type="text/css" /> -->
+<style>
+body {
+	margin: 0;
+	padding: 0;
+	color: #000000;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 16px;
+	line-height: 1.5em;
+	background-color: #FFFFFF;
+	background-image: url(PosterImage/geodarkbig.png);
+	background-repeat: repeat;
+	background-position: top center
+}
+
+.image_unlv img {
+	z-index: 1;
+	position: absolute;
+	bottom: 40px;
+	right: 40px;
+  	max-width: 13%;
+  	height: auto;
+}
+
+.right {
+	float: right;
+ 	padding: 0 10px 0 0;
+}
+
+.right1 {
+	float: right;
+ 	padding: 0 0 0 0;
+}
+
+.carousel-control {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 3%;  /* change this value to required width */
+  font-size: 30px;
+  color: #474747;
+  text-align: center;
+  text-shadow: 0 1px 1px rgba(142, 142, 142, 0.6);
+  background-color: rgba(101, 101, 101, 0);
+  filter: alpha(opacity=30);
+  opacity: .2;
+}
+
+.collapsible {
+  background-color: white;
+  color: black;
+  cursor: pointer;
+  padding: 14px;
+  width: 100%;
+  border: none;
+  text-align: left;
+  outline: none;
+  font-size: 15px;
+}
+
+.active, .collapsible:hover {
+  background-color: #c2c2c2;
+}
+
+.content {
+  padding: 0 18px;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.2s ease-out;
+  background-color: #white;
+}
+
+.panel-default > .panel-custom-title {
+    background: #c2c2c2; color: #0a1775;
+}
+h3 {
+margin-top:0px;
+}
+</style>
+
+<title>David R. Rice, Interior Solver</title>
+</head>
+<body>
+<div class='container' style='margin-top:20px'>
+  <div class='row'>
+    <div class='col-sm-12'>
+      <div class='panel panel-default'>
+        <div class='panel-body panel-custom-title'>
+          <h1 class='text-center'><b>MAGRATHEA: Terrestrial Planet Interior Solver <br> and the Degeneracy of Interiors</b></h1>
+          <h4 class='text-center'>David R. Rice<sup>1</sup>, Chenliang Huang (黄辰亮)<sup>2</sup>, and Jason H. Steffen<sup>1</sup></h4>
+          <p class='text-center'><sup>1</sup>University of Nevada, Las Vegas, <sup>2</sup>The University of Arizona</p>
+          <!-- <div class="image_unlv"><img src="PosterImage/UNLV-red.png"></div> -->
+          <div class="image_unlv"><img src="PosterImage/UNLV-red.png"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class='row'>
+    <div class='col-sm-12'>
+      <div class='panel panel-default'>
+        <div class='panel-body'>
+          <p><strong>Abstract</strong><br>
+          <p class="text-justify">MAGRATHEA is a newly-developed planet structure code for differentiated terrestrial planets. Our open source code supports spherically symmetric layers of iron, rock, ice/water, and ideal gas (with more options planned in future versions). MAGRATHEA integrates the hydrostatic equation to find the planet radius and pressure, density, temperature, and phase as a function of radius for a planet with the designated mass in each differentiated layer. Our code features enhanced flexibility to change the equations of state in each layer allowing for collaboration with high pressure physicists. The inferred densities of observed exoplanets allow for diverse compositions. Mass-radius relationships fail to capture the range of possible interiors and compositions a given planet may have. With MAGRATHEA, we explore planetary radii across a large parameter space of planet interiors.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class='row'>
+    <div class='col-sm-5'>
+      <div class='panel panel-default'>
+        <div class='panel-body'>
+          <h3>Model</h3>
+          <p>We consider planets which are spherically symmetric and fully-differentiated.
+          Given the mass of each layer the code returns the pressure, density, and temperature at enclosed mass, <i>m</i>, by solving:
+          </p>
+          <img src="PosterImage/interior.png" class="right" style="width: 40%">
+          <p style="line-height: 1.25em">1. Mass Continuity
+          <br>  \(\frac{dr(m)}{dm} = \frac{1}{4 \pi r^2 \rho(m)}\)</p>
+          <p style="line-height: 1.25em">2. Hydrostatic Equilibrium
+          <br>\(\frac{dP(m)}{dm} = -\frac{G m}{4 \pi r^4}\)</p>
+          <p style="line-height: 1.25em">3. Isothermal or Isentropic temperature profile. For isentropic:
+          <br>\(S(\rho,T) = S(\rho_0,T_0) \equiv S_0\)
+          <br>where \(S_0\) is the entropy at a reference point.</p>
+          <p style="line-height: 1.25em">4. Equation of state (EoS)
+          <br>\(P(m) = P(\rho(m),T(m))\)
+          <br> which describes the pressure for a layer as a function of the density, temperature, and composition.</p>
+          <p>The boundary conditions of the model are \(r=0\) at \(m=0\) and \(P = 1~bar\) at \(m=M_p\).
+            The temperature at the surface is user-defined. Jumps in temperature may also be defined at the boundaries between layers.</p>
+          <br>
+          <h3>MAGRATHEA</h3>
+          <p>The code is written in C++ and designed to enhance the ease-of-use, speed, and customization of interior solvers.
+          We solve the two-point boundary value problem by the shooting method to a fitting point using RKF-45.
+          There are several input modes including the regular solver, a quick temperature-free solver, a bulk input mode, and an MCMC method for testing EoS errors.
+          </p>
+        </div>
+      </div>
+      <div class='panel panel-default'>
+        <div class='panel-body'>
+          <h3>Equation of State Customization</h3>
+          <p>MAGRATHEA's key feature is our transparent structure for EoSs. Users can easily change and add additional equations for their planets. This empowers our collaboration with high-pressure physicists to include the most up-to-date experimental results.
+          <br><br>
+          Many types of EoS are accepted including tabulated (as in Seager et al. 2007), Birch-Murnagham, Vinet, Holzapfel, and Keane.
+          </p>
+
+          <p><img src='PosterImage/compare.svg' width='100%' height='auto'></p>
+          <p class='small'><em>Figure 1: To demonstrate different EoS choices, we plot the density as a function of radius inside a one Earth-mass planet with 33% of the mass in the core. Blue, Magrathea's Default planet with hcp-Fe core (Smith et al. 2018) and P-Pv mantle (Oganov & Ono 2004; Sakai et al. 2016) at 300K. Green, planet with Fe-Si alloy core (Wicks et al. 2018) and PREM mantle (Zeng et al. 2016). The radius of the earth-like planet differs by 1.3%.
+            Legend also lists the time for one run averaged over 100 runs. The non-default planet runs faster because these EoS choices have no thermodynamic information. These times may improve in the final version. </em></p>
+          <p>We have over 30 EoSs implemented in the code. Future additions will include liquid silicates and more complex atmospheres.</p>
+        </div>
+      </div>
+    </div>
+    <div class='col-sm-7'>
+      <div class='panel panel-default'>
+        <button class="collapsible"><h3>How to Read a Ternary Diagram <b>&#8691;</b></h3></button>
+        <div class="content">
+          <br>
+          <p>Ternary diagrams are a great way to plot 3 variables that add to a constant on an equilateral triangle.
+            Our diagrams show the entire range of compositions for a 3-layer differentiated planet.
+            The axes show the % of mass in the corresponding layer.
+            <br><br>
+            Scroll through this to get an idea of how our ternaries work:
+          </p>
+          <div id="myCarousel" class="carousel slide" data-ride="carousel" data-interval="false">
+            <!-- Wrapper for slides -->
+            <div class="carousel-inner">
+              <div class="item active">
+                <img src="PosterImage/readaternary/image-00.png" max-width="100%" height="auto">
+              </div>
+              <div class="item">
+                <img src="PosterImage/readaternary/image-01.png" max-width="100%" height="auto">
+              </div>
+              <div class="item">
+                <img src="PosterImage/readaternary/image-02.png" max-width="100%" height="auto">
+              </div>
+              <div class="item">
+                <img src="PosterImage/readaternary/image-03.png" max-width="100%" height="auto">
+              </div>
+              <div class="item">
+                <img src="PosterImage/readaternary/image-04.png" max-width="100%" height="auto">
+              </div>
+              <div class="item">
+                <img src="PosterImage/readaternary/image-05.png" max-width="100%" height="auto">
+              </div>
+              <div class="item">
+                <img src="PosterImage/readaternary/image-06.png" max-width="100%" height="auto">
+              </div>
+            </div>
+            <!-- Left and right controls -->
+            <a class="left carousel-control" href="#myCarousel" data-slide="prev">
+              <span class="glyphicon glyphicon-chevron-left"></span>
+              <span class="sr-only">Previous</span>
+            </a>
+            <a class="right carousel-control" href="#myCarousel" data-slide="next">
+              <span class="glyphicon glyphicon-chevron-right"></span>
+              <span class="sr-only">Next</span>
+            </a>
+          </div>
+          <br>
+        </div>
+      </div>
+      <div class='panel panel-default'>
+        <div class='panel-body'>
+          <h3>Degeneracy of Interiors</h3>
+          <p class="text-center" style="line-height: 1.1em; color: #3e3e3e"><em>"All you really need to know for the moment is that [planets are] a lot more complicated than you might think, even if you start from a position of thinking it’s pretty damn complicated in the first place."
+            ~Douglas Adams-ish</em></p>
+            <p>
+            Mass-radius relationships have been used extensively in describing planet composition. However, these relationships are not unique when considering a planet with three or more layers.
+              For a three-layer planet, ternary diagrams provide a way to visualize the interior structure parameter space for a planet with a certain mass. The axes of the ternary depict the percentages of mass in the three layers&#8212core, mantle, and water. Ternary diagrams have been used for exoplanet interiors in several works including Rogers & Seager 2010.
+
+            </p>
+
+            <p>Use these drop-downs to show a corresponding ternary created with MAGRATHEA:
+              <br>Mass
+            <select id=mass>
+                <option value="1">1</option>
+                <option value="3">3</option>
+                <option value="5">5</option>
+            </select>
+            \(M_\oplus\)</p>
+            <p> Surface Temp.
+            <select id=temp>
+                <option value="300">300</option>
+                <option value="1000">1000</option>
+            </select>
+            K</p>
+            <p> Atm. Mass
+            <select id=atm>
+                <option value="0">0</option>
+                <option value="1">0.01</option>
+                <option value="2">0.1</option>
+            </select>
+            %</p>
+            <img id="currentImage" src="PosterImage/ternary/ternary1-300-0.svg" width="100%" height="auto">
+          <p class='small'><em>Figure 2: The ternary shows the possible radii in Earth-radii of the user-selected planet across the entire range of composition. Marked and labeled is an Earth-like interior with 30% core and 70% mantle by mass. The atmosphere mass drop down adds a H/He ideal gas atmosphere with the corresponding mass percentage taken evenly from the three layers.
+            Each ternary is made up of 5,151 planets simulated with MAGRATHEA at integer mass percentages. Some extreme cases may still cause errors and show up as white. Plotting package is included in our code and makes use of <a href="https://github.com/marcharper/python-ternary" target="_blank">python-ternary</a> by Harper et al. 2015.</em></p>
+
+        </div>
+      </div>
+      <div class='panel panel-default'>
+        <div class='panel-body'>
+          <h3>TRAPPIST-1f  <img src='PosterImage/trappisttern.png' class="right1" width="55%" height="auto"></h3>
+          <p>Using MAGRATHEA, we combine the observational errors in mass and radius from Grimm et al. 2018 to find the most likely interior for Trappist-1f. On the figure, <em>right</em>, we plot the posterior of interior structure where black is higher probability.</p>
+          <br>Because of Trappist-1f's low bulk density, we see that the planet most likely has a significant water/ice layer. How much water is needed is dependent on the core/mantle size. Alternatively, you could achieve this bulk density with an atmosphere.
+        </div>
+      </div>
+      <div class='panel panel-default'>
+        <div class='panel-body'>
+          <h4 class="text-center">Become a Magrathean (Coming Soon):</h4>
+          <h4 class="text-center"><a href="https://github.com/Huang-CL/Magrathea" target="_blank">https://github.com/Huang-CL/Magrathea</a></h4>
+        </div>
+      </div>
+      <div class="row row-no-gutters">
+        <div class="col-sm-4">
+          <div class='panel panel-default'>
+            <div class='panel-body'>
+            <h4>Contact</h4>
+              <p>
+              David.Rice [at] unlv.edu<br>
+              <a href="http://www.physics.unlv.edu/~drice986/" target="_blank">Personal Website</a><br>
+              <a href='https://twitter.com/Magrathea_staff' target='_blank'>
+            <img src='PosterImage/Twitter_Logo_Blue.png' width=auto height='14px'></a>@Magrathea_staff<br>
+              </p>
+              <p class="text-center">Ask me about<br>
+              <a href="https://www.facebook.com/aotvegas" target="_blank">Astronomy on Tap</a>!
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-7 col-sm-offset-1">
+          <div class='panel panel-default'>
+            <div class='panel-body'>
+            <h4>References</h4>
+              <p class='small' style="line-height: 1.1em">
+              Grimm, S. et al., 2018, <a href="https://www.aanda.org/articles/aa/abs/2018/05/aa32233-17/aa32233-17.html" target="_blank">A&A, 613, A68</a><br>
+              Harper, M. et al., 2015 <a href="https://github.com/marcharper/python-ternary" target="_blank">Zenodo 10.5281/zenodo.594435</a><br>
+              Oganov, A. & Ono, S., 2004, <a href='https://www.nature.com/articles/nature02701' target='_blank'>Nature, 430, 445</a><br>
+              Rogers, L.A. & Seager, S., <a href='https://iopscience.iop.org/article/10.1088/0004-637X/712/2/974' target='_blank'>2010, ApJ, 712, 974</a><br>
+              Sakai, T. et al., 2016 <a href='https://www.nature.com/articles/srep22652' target='_blank'>Sci. Rep., 6, 22652</a><br>
+              Seager, S. et al., 2007, <a href='https://iopscience.iop.org/article/10.1086/521346' target='_blank'>ApJ, 669, 1279</a><br>
+              Smith, R.F. et al., 2018, <a href='https://www.nature.com/articles/s41550-018-0437-9' target='_blank'>Nature Ast., 2, 297</a><br>
+              Wicks, J.K. et al., 2018, <a href='https://advances.sciencemag.org/content/4/4/eaao5864' target='_blank'>Sci. Adv., 4, eaao5864</a><br>
+              Zeng, L. et al., 2016, <a href='https://iopscience.iop.org/article/10.3847/0004-637X/819/2/127' target='_blank'>ApJ, 819, 127</a>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="footer">
+  <p class='text-center' style="color: white"> Made by David R. Rice for Exoplanets III Conference &nbsp;|&nbsp; 27 July 2020</p>
+</div>
+
+<script>
+  $("#mass").on('change', function() {
+      var mass = $( "#mass").val();
+      var temp = $( "#temp").val();
+      var atmo = $( "#atm").val();
+
+      if (mass== '1'  && temp == '300' && atmo== '0'){
+
+          show_image('PosterImage/ternary/ternary1-300-0.svg')
+      }
+      if (mass== '1'  && temp == '300' && atmo== '1'){
+
+          show_image('PosterImage/ternary/ternary1-300-1.svg')
+      }
+      if (mass== '1'  && temp == '300' && atmo== '2'){
+
+          show_image('PosterImage/ternary/ternary1-300-2.svg')
+      }
+      if (mass== '1'  && temp == '1000' && atmo== '0'){
+
+          show_image('PosterImage/ternary/ternary1-1000-0.svg')
+      }
+      if (mass== '1'  && temp == '1000' && atmo== '1'){
+
+          show_image('PosterImage/ternary/ternary1-1000-1.svg')
+      }
+      if (mass== '1'  && temp == '1000' && atmo== '2'){
+
+          show_image('PosterImage/ternary/ternary1-1000-2.svg')
+      }
+      if (mass== '3'  && temp == '300' && atmo== '0'){
+
+          show_image('PosterImage/ternary/ternary3-300-0.svg')
+      }
+      if (mass== '3'  && temp == '300' && atmo== '1'){
+
+          show_image('PosterImage/ternary/ternary3-300-1.svg')
+      }
+      if (mass== '3'  && temp == '300' && atmo== '2'){
+
+          show_image('PosterImage/ternary/ternary3-300-2.svg')
+      }
+      if (mass== '3'  && temp == '1000' && atmo== '0'){
+
+          show_image('PosterImage/ternary/ternary3-1000-0.svg')
+      }
+      if (mass== '3'  && temp == '1000' && atmo== '1'){
+
+          show_image('PosterImage/ternary/ternary3-1000-1.svg')
+      }
+      if (mass== '3'  && temp == '1000' && atmo== '2'){
+
+          show_image('PosterImage/ternary/ternary3-1000-2.svg')
+      }
+      if (mass== '5'  && temp == '300' && atmo== '0'){
+
+          show_image('PosterImage/ternary/ternary5-300-0.svg')
+      }
+      if (mass== '5'  && temp == '300' && atmo== '1'){
+
+          show_image('PosterImage/ternary/ternary5-300-1.svg')
+      }
+      if (mass== '5'  && temp == '300' && atmo== '2'){
+
+          show_image('PosterImage/ternary/ternary5-300-2.svg')
+      }
+      if (mass== '5'  && temp == '1000' && atmo== '0'){
+
+          show_image('PosterImage/ternary/ternary5-1000-0.svg')
+      }
+      if (mass== '5'  && temp == '1000' && atmo== '1'){
+
+          show_image('PosterImage/ternary/ternary5-1000-1.svg')
+      }
+      if (mass== '5'  && temp == '1000' && atmo== '2'){
+
+          show_image('PosterImage/ternary/ternary5-1000-2.svg')
+      }
+});
+  $("#temp").on('change', function() {
+      var mass = $( "#mass option:selected" ).text();
+      var temp = $( "#temp option:selected" ).text();
+      var atmo = $( "#atm").val();
+
+      if (mass== '1'  && temp == '300' && atmo== '0'){
+
+          show_image('PosterImage/ternary/ternary1-300-0.svg')
+      }
+      if (mass== '1'  && temp == '300' && atmo== '1'){
+
+          show_image('PosterImage/ternary/ternary1-300-1.svg')
+      }
+      if (mass== '1'  && temp == '300' && atmo== '2'){
+
+          show_image('PosterImage/ternary/ternary1-300-2.svg')
+      }
+      if (mass== '1'  && temp == '1000' && atmo== '0'){
+
+          show_image('PosterImage/ternary/ternary1-1000-0.svg')
+      }
+      if (mass== '1'  && temp == '1000' && atmo== '1'){
+
+          show_image('PosterImage/ternary/ternary1-1000-1.svg')
+      }
+      if (mass== '1'  && temp == '1000' && atmo== '2'){
+
+          show_image('PosterImage/ternary/ternary1-1000-2.svg')
+      }
+      if (mass== '3'  && temp == '300' && atmo== '0'){
+
+          show_image('PosterImage/ternary/ternary3-300-0.svg')
+      }
+      if (mass== '3'  && temp == '300' && atmo== '1'){
+
+          show_image('PosterImage/ternary/ternary3-300-1.svg')
+      }
+      if (mass== '3'  && temp == '300' && atmo== '2'){
+
+          show_image('PosterImage/ternary/ternary3-300-2.svg')
+      }
+      if (mass== '3'  && temp == '1000' && atmo== '0'){
+
+          show_image('PosterImage/ternary/ternary3-1000-0.svg')
+      }
+      if (mass== '3'  && temp == '1000' && atmo== '1'){
+
+          show_image('PosterImage/ternary/ternary3-1000-1.svg')
+      }
+      if (mass== '3'  && temp == '1000' && atmo== '2'){
+
+          show_image('PosterImage/ternary/ternary3-1000-2.svg')
+      }
+      if (mass== '5'  && temp == '300' && atmo== '0'){
+
+          show_image('PosterImage/ternary/ternary5-300-0.svg')
+      }
+      if (mass== '5'  && temp == '300' && atmo== '1'){
+
+          show_image('PosterImage/ternary/ternary5-300-1.svg')
+      }
+      if (mass== '5'  && temp == '300' && atmo== '2'){
+
+          show_image('PosterImage/ternary/ternary5-300-2.svg')
+      }
+      if (mass== '5'  && temp == '1000' && atmo== '0'){
+
+          show_image('PosterImage/ternary/ternary5-1000-0.svg')
+      }
+      if (mass== '5'  && temp == '1000' && atmo== '1'){
+
+          show_image('PosterImage/ternary/ternary5-1000-1.svg')
+      }
+      if (mass== '5'  && temp == '1000' && atmo== '2'){
+
+          show_image('PosterImage/ternary/ternary5-1000-2.svg')
+      }
+});
+
+$("#atm").on('change', function() {
+      var mass = $( "#mass option:selected" ).text();
+      var temp = $( "#temp option:selected" ).text();
+      var atmo = $( "#atm").val();
+
+      if (mass== '1'  && temp == '300' && atmo== '0'){
+
+          show_image('PosterImage/ternary/ternary1-300-0.svg')
+      }
+      if (mass== '1'  && temp == '300' && atmo== '1'){
+
+          show_image('PosterImage/ternary/ternary1-300-1.svg')
+      }
+      if (mass== '1'  && temp == '300' && atmo== '2'){
+
+          show_image('PosterImage/ternary/ternary1-300-2.svg')
+      }
+      if (mass== '1'  && temp == '1000' && atmo== '0'){
+
+          show_image('PosterImage/ternary/ternary1-1000-0.svg')
+      }
+      if (mass== '1'  && temp == '1000' && atmo== '1'){
+
+          show_image('PosterImage/ternary/ternary1-1000-1.svg')
+      }
+      if (mass== '1'  && temp == '1000' && atmo== '2'){
+
+          show_image('PosterImage/ternary/ternary1-1000-2.svg')
+      }
+      if (mass== '3'  && temp == '300' && atmo== '0'){
+
+          show_image('PosterImage/ternary/ternary3-300-0.svg')
+      }
+      if (mass== '3'  && temp == '300' && atmo== '1'){
+
+          show_image('PosterImage/ternary/ternary3-300-1.svg')
+      }
+      if (mass== '3'  && temp == '300' && atmo== '2'){
+
+          show_image('PosterImage/ternary/ternary3-300-2.svg')
+      }
+      if (mass== '3'  && temp == '1000' && atmo== '0'){
+
+          show_image('PosterImage/ternary/ternary3-1000-0.svg')
+      }
+      if (mass== '3'  && temp == '1000' && atmo== '1'){
+
+          show_image('PosterImage/ternary/ternary3-1000-1.svg')
+      }
+      if (mass== '3'  && temp == '1000' && atmo== '2'){
+
+          show_image('PosterImage/ternary/ternary3-1000-2.svg')
+      }
+      if (mass== '5'  && temp == '300' && atmo== '0'){
+
+          show_image('PosterImage/ternary/ternary5-300-0.svg')
+      }
+      if (mass== '5'  && temp == '300' && atmo== '1'){
+
+          show_image('PosterImage/ternary/ternary5-300-1.svg')
+      }
+      if (mass== '5'  && temp == '300' && atmo== '2'){
+
+          show_image('PosterImage/ternary/ternary5-300-2.svg')
+      }
+      if (mass== '5'  && temp == '1000' && atmo== '0'){
+
+          show_image('PosterImage/ternary/ternary5-1000-0.svg')
+      }
+      if (mass== '5'  && temp == '1000' && atmo== '1'){
+
+          show_image('PosterImage/ternary/ternary5-1000-1.svg')
+      }
+      if (mass== '5'  && temp == '1000' && atmo== '2'){
+
+          show_image('PosterImage/ternary/ternary5-1000-2.svg')
+      }
+});
+
+function show_image(source) {
+  document.getElementById("currentImage").src = source;
+}
+
+</script>
+
+
+<script>
+var coll = document.getElementsByClassName("collapsible");
+var i;
+
+for (i = 0; i < coll.length; i++) {
+  coll[i].addEventListener("click", function() {
+    this.classList.toggle("active");
+    var content = this.nextElementSibling;
+    if (content.style.maxHeight){
+      content.style.maxHeight = null;
+    } else {
+      content.style.maxHeight = content.scrollHeight + "px";
+    }
+  });
+}
+</script>
+
+
+</body>
+</html>
+
