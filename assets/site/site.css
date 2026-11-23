@@ -122,3 +122,100 @@
     line-height: 1;
   }
 }
+
+@media screen {
+  :root {
+    color-scheme: light;
+    --bg: #EAE6DD;
+    --surface: #E1DDD3;
+    --surface-2: #D7D2C7;
+    --ink: #22231F;
+    --muted: #343630;
+    --dim: #51534B;
+    --accent: #262822;
+    --gold: #32332D;
+    --line: #B4B0A4;
+    --link: #2C4784;
+    --link-hover: #1C3567;
+  }
+
+  /* Pluto blue for text links, linked titles, and research questions */
+  a,
+  main a[href]:not(.image-credit, .question-row),
+  .site-footer a[href]:not(.footer-name),
+  .question-row h3 {
+    color: var(--link);
+  }
+
+  a:hover,
+  main a[href]:not(.image-credit, .question-row):hover,
+  .site-footer a[href]:not(.footer-name):hover,
+  .question-row:hover h3 {
+    color: var(--link-hover);
+  }
+
+  main p a[href],
+  .inline-links a[href] {
+    text-decoration-line: underline;
+  }
+
+  /* Graphite navigation with a blue active tab */
+  .nav-link,
+  .nav-link:hover,
+  .nav-link:focus-visible {
+    color: var(--ink);
+  }
+
+  .nav-link.active,
+  .js #primary-nav .nav-link.active {
+    color: var(--link);
+  }
+
+  .nav-link.active::after { background: var(--link); }
+
+  /* Light lettering over the dark Pluto photograph */
+  .home-masthead h1,
+  .home-masthead .masthead-content > p {
+    color: #EEF1F4;
+  }
+
+  .home-masthead .image-credit { color: #B9C7D6; }
+  .home-masthead .image-credit:hover { color: #FFF; }
+  .home-masthead .image-credit:focus-visible { outline-color: #C6D8FA; }
+
+  /* Footer, form controls, and keyboard focus */
+  .site-footer { background-color: #DCD8CD; }
+  .jump-links a { border-bottom-color: currentColor; }
+
+  .button,
+  .menu-toggle,
+  .explorer-controls select {
+    border-color: #77766D;
+  }
+
+  .explorer-controls select {
+    background-color: var(--bg);
+    color: var(--ink);
+  }
+
+  a:focus-visible,
+  button:focus-visible,
+  select:focus-visible {
+    outline-color: var(--link);
+  }
+
+  .skip-link,
+  .skip-link:hover {
+    background: var(--link);
+    color: #FFF;
+  }
+
+  ::selection {
+    background: #3C3E38;
+    color: #FFF;
+  }
+
+  /* The April Fools entry has its own colors in publications.html */
+  .publications-wrap .april-fools-paper { border-left-color: #71819B; }
+  .publications-wrap .april-fools-paper .eyebrow { color: var(--dim); }
+}
